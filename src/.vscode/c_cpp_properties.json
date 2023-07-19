@@ -1,0 +1,39 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/tzq/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/tzq/catkin_ws/src/RFID_Based_Robot_Navigation/include/**",
+        "/home/tzq/catkin_ws/src/rfid/calculation/include/**",
+        "/home/tzq/catkin_ws/src/vision_opencv-melodic/cv_bridge/include/**",
+        "/home/tzq/catkin_ws/src/vision_opencv-melodic/image_geometry/include/**",
+        "/home/tzq/catkin_ws/src/rfid/impinj_control/include/**",
+        "/home/tzq/catkin_ws/src/LeGO-LOAM/LeGO-LOAM/include/**",
+        "/home/tzq/catkin_ws/src/rfid/odom_publisher/include/**",
+        "/home/tzq/catkin_ws/src/rfid/package_launch/include/**",
+        "/home/tzq/catkin_ws/src/rfid_reader/include/**",
+        "/home/tzq/catkin_ws/src/rfid/rviz_publish/include/**",
+        "/home/tzq/catkin_ws/src/tracer_ros/tracer_base/include/**",
+        "/home/tzq/catkin_ws/src/tracer_ros/tracer_gazebo_sim/include/**",
+        "/home/tzq/catkin_ws/src/tracer_test/include/**",
+        "/home/tzq/catkin_ws/src/velodyne-master/velodyne_driver/include/**",
+        "/home/tzq/catkin_ws/src/velodyne-master/velodyne_laserscan/include/**",
+        "/home/tzq/catkin_ws/src/velodyne-master/velodyne_pcl/include/**",
+        "/home/tzq/catkin_ws/src/velodyne-master/velodyne_pointcloud/include/**",
+        "/home/tzq/catkin_ws/src/agx_sdk-scout_v2/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
