@@ -16,27 +16,27 @@
 #define ARRAY_SIZE				1000000								//保存数组的大小
 
 #define PI						3.1415926
-#define	antenna_H_left				21.274//27.08//24.1
+#define	antenna_H_left				21.274/100//27.08//24.1
 #define	antenna_alpha_left			1.524 //(1.5707963+0.0739)//67.2/180*PI
-#define	antenna_H_right				21.274//29.07//25.2
+#define	antenna_H_right				21.274/100//29.07//25.2
 #define	antenna_alpha_right			1.524 //(1.5707963+0.0689)//67.0/180*PI
 
-#define antenna_left_x				1.0
-#define antenna_left_y			    -21.25
-#define antenna_right_x				1.0
-#define antenna_right_y			    21.25
+#define antenna_left_x				1.0/100
+#define antenna_left_y			    -21.25/100
+#define antenna_right_x				1.0/100
+#define antenna_right_y			    21.25/100
 
 #define	control_period			0.1									//控制周期，单位秒 
-#define	sample_total_len		20									//初始的采样长度，cm
-#define phase_grade_len			6.0									//相位梯度对应的物理距离，cm
+#define	sample_total_len		20/100									//初始的采样长度，m
+#define phase_grade_len			6.0/100									//相位梯度对应的物理距离，m
 
-#define	tag_target_relative_x	10.0								//cm
-#define tag_target_relative_y	0.0									//cm
+#define	tag_target_relative_x	10.0/100								//m
+#define tag_target_relative_y	0.0									//m
 
-#define tag_distance_threshold  40.0				//cm
+#define tag_distance_threshold  40.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
-#define	robot_translational_vel0	2.0/100								//cm/s
+#define	robot_translational_vel0	2.0/100								//m/s
 #define robot_rotational_vel0		0.0								
 
 #define true 1
@@ -44,10 +44,10 @@
 
 #define PF_count		1000		//粒子滤波的粒子数量
 #define PF_scope_x_min	0			//定位区域x坐标最小值
-#define PF_scope_x_max	300			//定位区域x坐标最大值
-#define PF_scope_y_min	-100		//定位区域y坐标最小值
-#define PF_scope_y_max	100			//定位区域y坐标最大值
-#define PF_Q			3			//过程噪声，标准差，单位cm
+#define PF_scope_x_max	3			//定位区域x坐标最大值
+#define PF_scope_y_min	-1		//定位区域y坐标最小值
+#define PF_scope_y_max	1			//定位区域y坐标最大值
+#define PF_Q			0.03			//过程噪声，标准差，单位m
 #define PF_R			pow(0.1,2)	//测量噪声，方差，单位rad
 
 #define LINEAR_MAX_VEL 0.5  //速度最大值

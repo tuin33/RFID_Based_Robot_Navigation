@@ -20,8 +20,8 @@ typedef struct TagDataStruct
 	double				x=0.0;						//读取到标签信息的时刻，天线的绝对坐标-X坐标
 	double				y=0.0;						//读取到标签信息的时刻，天线的绝对坐标-Y坐标
 	unsigned short		 AntennaID;					//读写器ID，左侧读写器ID为1，右侧读写器ID为2
-	double				robotX =0.0;						//机器人坐标-X cm
-	double				robotY=0.0;						//机器人坐标-Y cm
+	double				robotX =0.0;						//机器人坐标-X m
+	double				robotY=0.0;						//机器人坐标-Y m
 	double				robotTh=0.0;					//机器人朝向角（弧度）-Th
 }TagData;
 

@@ -18,7 +18,7 @@ tuple<double, double, double, int> linear(double timestamp, OdomData odom)
 {
 	double robot_x = 0, robot_y = 0, robot_th = 0;
 	int resultCode = 0;
-	for (int i = 0; i < odom.robot_timestamp.size(); i++)
+	for (int i = 1; i < odom.robot_timestamp.size(); i++)
 	{
 		if (timestamp < odom.robot_timestamp[i])
 		{
@@ -48,8 +48,8 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 	}
 	else
 	{
-		double robot_x = get<0>(getPose) * 100.0;
-		double robot_y = get<1>(getPose) * 100.0;
+		double robot_x = get<0>(getPose) ;
+		double robot_y = get<1>(getPose) ;
 		double robot_th = get<2>(getPose);
 		if (tagData->AntennaID == LEFT_READER_ID)
 		{
@@ -58,6 +58,7 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 			tagData->robotX = robot_x;
 			tagData->robotY = robot_y;
 			tagData->robotTh = robot_th;
+			cout << "Info: left TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<< endl;
 		}
 		else if (tagData->AntennaID == RIGHT_READER_ID)
 		{
@@ -66,8 +67,10 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 			tagData->robotX = robot_x;
 			tagData->robotY = robot_y;
 			tagData->robotTh = robot_th;
+			cout << "Info: right TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<< endl;
 		}
 		tagData->isAssignedPose = true;
+
 	}
 	return;
 }
@@ -131,8 +134,8 @@ tuple<double, double> Controller::getMotion(vector<TagData> leftTagDataArray, ve
 	/* 获取机器人的位置和姿态并进行单位换算 cm rad cm/s*/
 	int odomNum = odom.robot_x.size();
 
-	robot_xt[i] = odom.robot_x[odomNum - 1] * 100;
-	robot_yt[i] = odom.robot_y[odomNum - 1] * 100; // m-->cm
+	robot_xt[i] = odom.robot_x[odomNum - 1] ;
+	robot_yt[i] = odom.robot_y[odomNum - 1] ; // m-->cm
 	robot_tht[i] = odom.robot_th[odomNum - 1];
 	// robot_vel[i] = odom.robot_vel[odomNum-1] * 100; // m/s-->cm/s
 
@@ -259,14 +262,14 @@ tuple<double, double> Controller::getMotion(vector<TagData> leftTagDataArray, ve
 	}
 	cout << "左天线相位当前数量: " << phase_num_count_left << endl;
 	cout << "右天线相位当前数量: " << phase_num_count_right << endl;
-	for(int i=0;i<phase_num_count_left;i++)
-	{
-		cout<<"左天线相位: "<<phase_pos_left_antenna(i)<<endl;
-	}
-	for(int i=0;i<phase_num_count_right;i++)
-	{
-		cout<<"右天线相位: "<<phase_pos_right_antenna(i)<<endl;
-	}
+	// for(int i=0;i<phase_num_count_left;i++)
+	// {
+	// 	cout<<"左天线相位: "<<phase_pos_left_antenna(i)<<endl;
+	// }
+	// for(int i=0;i<phase_num_count_right;i++)
+	// {
+	// 	cout<<"右天线相位: "<<phase_pos_right_antenna(i)<<endl;
+	// }
 	// cout<<"poseX:"<<robotPose.pose.pose.position.x<<endl;
 	cout << "location_state:" << location_state << endl;
 	if ((robot_xt[i] < sample_total_len) && (location_state == -1)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
@@ -328,7 +331,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> leftTagDataArray, ve
 		{
 			double left_distance_interval = sqrt(pow(leftTagDataArray[leftEnd].x - leftTagDataArray[leftStart].x, 2) + pow(leftTagDataArray[leftEnd].y - leftTagDataArray[leftStart].y, 2));
 			double right_distance_interval = sqrt(pow(rightTagDataArray[rightEnd].x - rightTagDataArray[rightStart].x, 2) + pow(rightTagDataArray[rightEnd].y - rightTagDataArray[rightStart].y, 2));
-			if ((left_distance_interval > 6) || (right_distance_interval > 6))
+			if ((left_distance_interval > 6.0/100) || (right_distance_interval > 6.0/100))
 			{
 				break;
 			}
@@ -423,7 +426,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> leftTagDataArray, ve
 				std_y = sqrt((PF_center_mean.block(1, i - num + 1, 1, num).array() - mean_y).array().pow(2).sum() / (num));
 			}
 
-			if ((i > 15) && ((location_state == 1) || ((std_x < 20) && (std_y < 20)))) // 定位稳定性判断
+			if ((i > 15) && ((location_state == 1) || ((std_x < 0.2) && (std_y < 0.2)))) // 定位稳定性判断
 			{
 				cout << "Location stable." << endl;
 				location_state = 1;

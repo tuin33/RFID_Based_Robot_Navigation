@@ -349,7 +349,7 @@ int CMyApplication::run(
 								if (0 == startROSpec())
 								{
 									rc = 7;
-									if (0 == awaitAndPrintReport(1)) // timeout(seconds)
+									if (0 == awaitAndPrintReport(3)) // timeout(seconds)
 									{
 										rc = 8;
 										if (0 == stopROSpec())
