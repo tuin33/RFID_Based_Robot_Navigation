@@ -15,7 +15,7 @@ typedef struct TagDataStruct
 	string				epcBuffer;					//标签EPC
 	double				phase;						//相位
 	double				frequency;					//频率
-	unsigned long long	timestamp;					//firstSeenTimestampUTC
+	double				timestamp;					//firstSeenTimestampUTC
 	unsigned long long	timestamp_pc;				//记录电脑取出标签信息的时间戳
 	double				x=0.0;						//读取到标签信息的时刻，天线的绝对坐标-X坐标
 	double				y=0.0;						//读取到标签信息的时刻，天线的绝对坐标-Y坐标
