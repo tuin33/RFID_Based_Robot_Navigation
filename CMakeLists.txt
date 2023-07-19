@@ -184,6 +184,9 @@ target_link_libraries(RFIDreceiver ${LIBS} ${catkin_LIBRARIES})
 add_executable(coreControl src/coreControl.cpp src/MainEntry.cpp)
 target_link_libraries(coreControl ${LIBS} ${catkin_LIBRARIES})
 
+add_executable(coreControl_cp src/coreControl_cp.cpp src/MainEntry.cpp)
+target_link_libraries(coreControl_cp ${LIBS} ${catkin_LIBRARIES})
+
 add_executable(rfid_node_start src/RFIDHandler.cpp src/HandlerStart.cpp)
 target_link_libraries(rfid_node_start ${LIBS} ${catkin_LIBRARIES})
 add_executable(rfid_node_stop src/RFIDHandler.cpp src/HandlerStop.cpp)
@@ -191,6 +194,9 @@ target_link_libraries(rfid_node_stop ${LIBS} ${catkin_LIBRARIES})
 
 add_executable(keyboard_node_aria src/aria_keyboard_node.cpp)
 target_link_libraries(keyboard_node_aria ${LIBS} ${catkin_LIBRARIES})
+
+add_executable(set_permissions_node src/set_permissions_node.cpp)
+target_link_libraries(set_permissions_node ${LIBS} ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############

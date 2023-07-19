@@ -1,0 +1,11 @@
+<launch>
+  <!-- 运行 t1.launch -->
+  <include file="$(find RFID_Based_Robot_Navigation)/launch/init.launch" />
+
+  <!-- 等待3秒 -->
+  <node name="wait_node" pkg="ros1_launch" type="wait" args="3" />
+
+  <!-- 运行 t2.launch -->
+  <node pkg="RFID_Based_Robot_Navigation" type="coreControl_cp" name="control" output="screen" />
+
+</launch>

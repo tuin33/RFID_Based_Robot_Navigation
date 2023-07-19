@@ -260,7 +260,7 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
     double linear_x, angular;
     if(control.iteration_count < 500)
     {
-        tuple<double, double> motion = control.getMotion(leftTagDataArray, rightTagDataArray, odom, control.iteration_count);
+        tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom, control.iteration_count);
         linear_x = get<0>(motion);
         angular = get<1>(motion);
         // Tempolimits einhalten

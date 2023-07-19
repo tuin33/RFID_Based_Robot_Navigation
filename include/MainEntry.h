@@ -168,6 +168,6 @@ public:
     double pid_angle_compute(double real_angle, double target_angle);
 
     // 粒子滤波
-    tuple<double, double> getMotion(vector<TagData> leftTagDataArray, vector<TagData> rightTagDataArray, OdomData odom, int i);
+    tuple<double, double> getMotion(vector<TagData>* leftTagDataArray, vector<TagData>* rightTagDataArray, OdomData odom, int i);
 };
 #endif

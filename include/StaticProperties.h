@@ -27,7 +27,7 @@
 #define antenna_right_y			    21.25/100
 
 #define	control_period			0.1									//控制周期，单位秒 
-#define	sample_total_len		20/100									//初始的采样长度，m
+#define	sample_total_len		20.0/100									//初始的采样长度，m
 #define phase_grade_len			6.0/100									//相位梯度对应的物理距离，m
 
 #define	tag_target_relative_x	10.0/100								//m
@@ -44,7 +44,7 @@
 
 #define PF_count		1000		//粒子滤波的粒子数量
 #define PF_scope_x_min	0			//定位区域x坐标最小值
-#define PF_scope_x_max	3			//定位区域x坐标最大值
+#define PF_scope_x_max	5			//定位区域x坐标最大值
 #define PF_scope_y_min	-1		//定位区域y坐标最小值
 #define PF_scope_y_max	1			//定位区域y坐标最大值
 #define PF_Q			0.03			//过程噪声，标准差，单位m
