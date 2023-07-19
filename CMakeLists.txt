@@ -72,6 +72,8 @@ add_message_files(
   FILES
   RFIDdata.msg
   sendEnding.msg
+  rfid_msgs.msg
+  tag_msgs.msg
 )
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -181,6 +183,14 @@ add_executable(RFIDreceiver src/RFIDreceiver.cpp)
 target_link_libraries(RFIDreceiver ${LIBS} ${catkin_LIBRARIES})
 add_executable(coreControl src/coreControl.cpp src/MainEntry.cpp)
 target_link_libraries(coreControl ${LIBS} ${catkin_LIBRARIES})
+
+add_executable(rfid_node_start src/RFIDHandler.cpp src/HandlerStart.cpp)
+target_link_libraries(rfid_node_start ${LIBS} ${catkin_LIBRARIES})
+add_executable(rfid_node_stop src/RFIDHandler.cpp src/HandlerStop.cpp)
+target_link_libraries(rfid_node_stop ${LIBS} ${catkin_LIBRARIES})
+
+add_executable(keyboard_node_aria src/aria_keyboard_node.cpp)
+target_link_libraries(keyboard_node_aria ${LIBS} ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############

@@ -7,8 +7,9 @@ public:
 	char		        	epc[128];			     //��ǩEPC
 	double		        	phase;				     //��λ
 	double                  rssi;                                // �ź�ǿ��
-	unsigned long long		timestamp;		             //firstSeenTimestampUTC
+	double					timestamp;		             //firstSeenTimestampUTC
 	double      			timestamp_pc;			     //��¼����ȡ����ǩ��Ϣ��ʱ���
+	double      			timestamp_ros;			     //��¼����ȡ����ǩ��Ϣ��ʱ���
 	double					robotX;			             //����������-X cm
 	double					robotY;			             //����������-Y cm
 	double		        	robotTh;			     //�����˳���ǣ����ȣ�-Th

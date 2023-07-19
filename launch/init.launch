@@ -1,0 +1,7 @@
+<launch>
+  <!-- 运行 t1.launch -->
+  <include file="RFID_Based_Robot_Navigation/launch/aria_init.launch" />
+
+  <!-- 运行 t2.launch -->
+  <include file="RFID_Based_Robot_Navigation/launch/rfid_start.launch" />
+</launch>

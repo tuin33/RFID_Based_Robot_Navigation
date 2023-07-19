@@ -1,0 +1,4 @@
+<launch>
+  <!-- 启动 keyboard_node_aria 节点 -->
+  <node pkg="RFID_Based_Robot_Navigation" type="rfid_node_start" name="start_rfid" output="screen" />
+</launch>

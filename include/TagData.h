@@ -16,7 +16,7 @@ typedef struct TagDataStruct
 	double				phase;						//相位
 	double				frequency;					//频率
 	double				timestamp;					//firstSeenTimestampUTC
-	unsigned long long	timestamp_pc;				//记录电脑取出标签信息的时间戳
+	double				timestamp_pc;				//记录电脑取出标签信息的时间戳
 	double				x=0.0;						//读取到标签信息的时刻，天线的绝对坐标-X坐标
 	double				y=0.0;						//读取到标签信息的时刻，天线的绝对坐标-Y坐标
 	unsigned short		 AntennaID;					//读写器ID，左侧读写器ID为1，右侧读写器ID为2
