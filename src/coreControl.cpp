@@ -191,7 +191,8 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
     ROS_INFO("Received ending info.");
     char fileName1[200] = {0};
     std::ofstream data;
-    sprintf(fileName1, "//home//tzq//data//test//nav//RFIDdata_left.txt");
+    // sprintf(fileName1, "//home//tzq//data//test//nav//RFIDdata_left.txt");
+    sprintf(fileName1, "//home//haoran//data//nav//RFIDdata_left.txt");
     if (data.fail())
     {
         ROS_INFO("Open file 1 failed");
@@ -199,7 +200,7 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
     else
     {
         data.open(fileName1, std::ios::out);
-        ROS_INFO("file 1 is open");
+        //ROS_INFO("file 1 is open");
         int cnt1 = 0;
         for (int i = 0; i<leftTagDataArray.size(); i++)
         {
@@ -210,7 +211,8 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
 
     char fileName2[200] = {0};
     std::ofstream data1;
-    sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName2, "//home//haoran//data//nav//RFIDdata_right.txt");
     if (data1.fail())
     {
         ROS_INFO("Open file 2 failed");
@@ -218,7 +220,7 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
     else
     {
         data1.open(fileName2, std::ios::out);
-        ROS_INFO("file 2 is open");
+        //ROS_INFO("file 2 is open");
         int cnt2 = 0;
         for (int i = 0; i<rightTagDataArray.size(); i++)
         {
@@ -229,7 +231,8 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
 
     char fileName3[200] = {0};
     std::ofstream Odom;
-    sprintf(fileName3, "//home//tzq//data//test//nav//odom.txt");
+    // sprintf(fileName3, "//home//tzq//data//test//nav//odom.txt");
+    sprintf(fileName3, "//home//haoran//data//nav//odom.txt");
     if (Odom.fail())
     {
         ROS_INFO("Open file 3 failed");
@@ -237,7 +240,7 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
     else
     {
         Odom.open(fileName3, std::ios::out);
-        ROS_INFO("file 3 is open");
+        //ROS_INFO("file 3 is open");
         //int cnt1 = 0;
         for (auto it1 = 0; it1 != odom_save.robot_x.size(); it1++)
         {
@@ -285,6 +288,7 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
         control.vel_msg.linear.x = linear_x;
         control.vel_msg.angular.z = angular;
         ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
+        cout << "-------------------------------------------------------------------------------------" << endl;
         // leftTagDataArray.clear();
         // rightTagDataArray.clear();
         control.iteration_count++;
