@@ -351,7 +351,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			}
 			double left_phase_dis = sqrt(pow(leftTagDataArray->at(leftStart).x - leftTagDataArray->at(leftStart+1).x, 2) + pow(leftTagDataArray->at(leftStart).y - leftTagDataArray->at(leftStart+1).y, 2));
 			double right_phase_dis = sqrt(pow(rightTagDataArray->at(rightStart).x - rightTagDataArray->at(rightStart+1).x, 2) + pow(rightTagDataArray->at(rightStart).y - rightTagDataArray->at(rightStart+1).y, 2));
-			if ((left_phase_dis > 3) || (right_phase_dis > 3))
+			if ((left_phase_dis > 3.0/100) || (right_phase_dis > 3.0/100))
 			{
 				leftStart = leftStart + 1;
 				rightStart = rightStart + 1;
@@ -359,7 +359,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			}
 		}
 		//cout << "3" << endl;
-		double wave_length_var[16] = {32.5866, 32.5777, 32.5689, 32.56, 32.5512, 32.5424, 32.5336, 32.5247, 32.5159, 32.5071, 32.4983, 32.4895, 32.4807, 32.4719, 32.4631, 32.4544}; // 波长，cm
+		double wave_length_var[16] = {32.5866/100, 32.5777, 32.5689, 32.56, 32.5512, 32.5424, 32.5336, 32.5247, 32.5159, 32.5071, 32.4983, 32.4895, 32.4807, 32.4719, 32.4631, 32.4544}; // 波长，cm
 		/*左右天线前一时刻相位*/
 		RowVectorXd PF_distance_left_antenna(PF_count);	 // 行向量
 		RowVectorXd PF_distance_right_antenna(PF_count); // 行向量
@@ -386,7 +386,8 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		/*实际观测相位梯度*/
 		double PF_observe_left = phase_pos_left_antenna(leftEnd) - phase_pos_left_antenna(leftStart);
 		double PF_observe_right = phase_pos_right_antenna(rightEnd) - phase_pos_right_antenna(rightStart);
-
+		cout<<"PF_observe_left: "<<PF_observe_left<<endl;
+		cout<<"PF_observe_right: "<<PF_observe_right<<endl;
 		/*粒子权重评估*/
 		PF_distance.row(0) = PF_particle.row(4).array() - PF_observe_left;
 		PF_w.row(0) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(0).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
@@ -395,6 +396,8 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		PF_w.row(1) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(1).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
 
 		PF_w.row(2) = PF_w.row(0).array() * PF_w.row(1).array(); // 综合权重
+		cout<<"PF_distance.row(0): "<<PF_distance.row(0)<<endl;
+		cout<<"PF_distance.row(1): "<<PF_distance.row(1)<<endl;
 		//cout << "4" << endl;
 		/*重采样*/
 		MatrixXd PF_particle_new(8, PF_count);
