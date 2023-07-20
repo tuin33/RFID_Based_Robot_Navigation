@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: RFID_Based_Robot_Navigation
+Description: Description of RFID_Based_Robot_Navigation
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: impinj_control roscpp rospy std_msgs message_runtime

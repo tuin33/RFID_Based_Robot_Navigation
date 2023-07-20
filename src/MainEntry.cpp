@@ -41,15 +41,15 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 	if (resultCode != 1)
 	{
 		cout << "Warn：AssignmentPoseForTagData Exception!"
-			 << " return code: " << resultCode<<endl;
-			//  << "(天线编号，数组下标) is"
-			//  << "(" << tagData->readerID << "," << tagData->index << ")"
-			//  << "ArTime:" << tagData->timestamp_robot.getSec() << '.' << tagData->timestamp_robot.getMSec() << endl;
+			 << " return code: " << resultCode << endl;
+		//  << "(天线编号，数组下标) is"
+		//  << "(" << tagData->readerID << "," << tagData->index << ")"
+		//  << "ArTime:" << tagData->timestamp_robot.getSec() << '.' << tagData->timestamp_robot.getMSec() << endl;
 	}
 	else
 	{
-		double robot_x = get<0>(getPose) ;
-		double robot_y = get<1>(getPose) ;
+		double robot_x = get<0>(getPose);
+		double robot_y = get<1>(getPose);
 		double robot_th = get<2>(getPose);
 		if (tagData->AntennaID == LEFT_READER_ID)
 		{
@@ -58,7 +58,7 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 			tagData->robotX = robot_x;
 			tagData->robotY = robot_y;
 			tagData->robotTh = robot_th;
-			//cout << "Info: left TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<<"th= "<<tagData->robotTh<<endl;
+			// cout << "Info: left TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<<"th= "<<tagData->robotTh<<endl;
 		}
 		else if (tagData->AntennaID == RIGHT_READER_ID)
 		{
@@ -67,10 +67,9 @@ void assignPoseForTagData(TagData *tagData, OdomData odom)
 			tagData->robotX = robot_x;
 			tagData->robotY = robot_y;
 			tagData->robotTh = robot_th;
-			//cout << "Info: right TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<< "th= "<<tagData->robotTh<<endl;
+			// cout << "Info: right TagData pose assigned! x=" <<tagData->x<<" y="<<tagData->y<< "th= "<<tagData->robotTh<<endl;
 		}
 		tagData->isAssignedPose = true;
-
 	}
 	return;
 }
@@ -120,7 +119,7 @@ double Controller::pid_angle_compute(double real_angle, double target_angle)
 	return output;
 }
 
-tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, vector<TagData>* rightTagDataArray, OdomData odom, int i)
+tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, vector<TagData> *rightTagDataArray, OdomData odom, int i)
 {
 	// vector<double> dataVector;
 	/* 记录某一时刻的机器人时间和系统时间戳
@@ -134,12 +133,12 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 	/* 获取机器人的位置和姿态并进行单位换算 cm rad cm/s*/
 	int odomNum = odom.robot_x.size();
 
-	robot_xt[i] = odom.robot_x[odomNum - 1] ;
-	robot_yt[i] = odom.robot_y[odomNum - 1] ; // m-->cm
+	robot_xt[i] = odom.robot_x[odomNum - 1];
+	robot_yt[i] = odom.robot_y[odomNum - 1]; // m-->cm
 	robot_tht[i] = odom.robot_th[odomNum - 1];
-	cout<<"robot_xt[i]: "<<robot_xt[i]<<endl;
-	cout<<"robot_yt[i]: "<<robot_yt[i]<<endl;
-	cout<<"robot_tht[i]: "<<robot_tht[i]<<endl;
+	cout << "robot_xt[i]: " << robot_xt[i] << endl;
+	cout << "robot_yt[i]: " << robot_yt[i] << endl;
+	cout << "robot_tht[i]: " << robot_tht[i] << endl;
 	// robot_vel[i] = odom.robot_vel[odomNum-1] * 100; // m/s-->cm/s
 
 	std::cout << "Info: robot pose and velocity got" << std::endl;
@@ -210,6 +209,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			phase_pos_left_antenna(phase_num_count_left) = phase_pre_left_antenna_2(phase_num_count_left) - 2 * PI * k;
 		}
 	}
+
 	if ((phase_flag_right == 0) && (right_index_mapping[i] >= 0))
 	{
 		// 右天线
@@ -265,14 +265,14 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 	}
 	cout << "左天线相位当前数量: " << phase_num_count_left << endl;
 	cout << "右天线相位当前数量: " << phase_num_count_right << endl;
-	// for(int i=0;i<phase_num_count_left;i++)
-	// {
-	// 	cout<<"左天线相位: "<<phase_pos_left_antenna(i)<<endl;
-	// }
-	// for(int i=0;i<phase_num_count_right;i++)
-	// {
-	// 	cout<<"右天线相位: "<<phase_pos_right_antenna(i)<<endl;
-	// }
+	for(int i=0;i<phase_num_count_left;i++)
+	{
+		cout<<"左天线相位: "<<phase_pos_left_antenna(i)<<endl;
+	}
+	for(int i=0;i<phase_num_count_right;i++)
+	{
+		cout<<"右天线相位: "<<phase_pos_right_antenna(i)<<endl;
+	}
 	// cout<<"poseX:"<<robotPose.pose.pose.position.x<<endl;
 	cout << "location_state:" << location_state << endl;
 	if ((robot_xt[i] < sample_total_len) && (location_state == -1)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
@@ -285,10 +285,10 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		// std::cout << "Y:" << std::endl;
 		// std::cout << PF_particle.row(1) << std::endl;
 		PF_center_mean(0, i) = 0; // 计算粒子的x轴坐标均值
-		PF_center_mean(1, i) = 0; 
+		PF_center_mean(1, i) = 0;
 
 		// PF_center_mean(0, i) = PF_particle.block(0, 0, 1, PF_count).sum() / PF_count; // 计算粒子的x轴坐标均值
-		// PF_center_mean(1, i) = PF_particle.block(1, 0, 1, PF_count).sum() / PF_count; 
+		// PF_center_mean(1, i) = PF_particle.block(1, 0, 1, PF_count).sum() / PF_count;
 		// cout<<"第"<<i<<"次定位结果为:x="<<PF_center_mean(0, i)<<" y="<<PF_center_mean(1, i)<<endl;
 		tag_estimation_real_x(i) = 0;
 		tag_estimation_real_y(i) = 0;
@@ -314,12 +314,12 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			// double ran2 = normal(gen);
 			PF_particle(1, j) = PF_particle(1, j) + normal(gen);
 		}
-		//cout << "1" << endl;
+		// cout << "1" << endl;
 
 		/*确定最后一个有效测量点的下标*/
 		int leftEnd = left_index_mapping[i];
 		int rightEnd = right_index_mapping[i];
-		
+
 		while (!leftTagDataArray->at(leftEnd).isAssignedPose)
 		{
 			leftEnd--;
@@ -328,7 +328,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		{
 			rightEnd--;
 		}
-		//cout << "2" << endl;
+		// cout << "2" << endl;
 		/*确定距离 相位梯度 距离点的测量点的下标*/
 		int leftStart = leftEnd;
 		int rightStart = rightEnd;
@@ -336,7 +336,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		{
 			double left_distance_interval = sqrt(pow(leftTagDataArray->at(leftEnd).x - leftTagDataArray->at(leftStart).x, 2) + pow(leftTagDataArray->at(leftEnd).y - leftTagDataArray->at(leftStart).y, 2));
 			double right_distance_interval = sqrt(pow(rightTagDataArray->at(rightEnd).x - rightTagDataArray->at(rightStart).x, 2) + pow(rightTagDataArray->at(rightEnd).y - rightTagDataArray->at(rightStart).y, 2));
-			if ((left_distance_interval > 6.0/100) || (right_distance_interval > 6.0/100))
+			if ((left_distance_interval > 6.0 / 100) || (right_distance_interval > 6.0 / 100))
 			{
 				break;
 			}
@@ -349,31 +349,44 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			{
 				break;
 			}
-			double left_phase_dis = sqrt(pow(leftTagDataArray->at(leftStart).x - leftTagDataArray->at(leftStart+1).x, 2) + pow(leftTagDataArray->at(leftStart).y - leftTagDataArray->at(leftStart+1).y, 2));
-			double right_phase_dis = sqrt(pow(rightTagDataArray->at(rightStart).x - rightTagDataArray->at(rightStart+1).x, 2) + pow(rightTagDataArray->at(rightStart).y - rightTagDataArray->at(rightStart+1).y, 2));
-			if ((left_phase_dis > 3.0/100) || (right_phase_dis > 3.0/100))
+			double left_phase_dis = sqrt(pow(leftTagDataArray->at(leftStart).x - leftTagDataArray->at(leftStart + 1).x, 2) + pow(leftTagDataArray->at(leftStart).y - leftTagDataArray->at(leftStart + 1).y, 2));
+			double right_phase_dis = sqrt(pow(rightTagDataArray->at(rightStart).x - rightTagDataArray->at(rightStart + 1).x, 2) + pow(rightTagDataArray->at(rightStart).y - rightTagDataArray->at(rightStart + 1).y, 2));
+			if ((left_phase_dis > 3.0 / 100) || (right_phase_dis > 3.0 / 100))
 			{
 				leftStart = leftStart + 1;
 				rightStart = rightStart + 1;
 				break;
 			}
 		}
-		//cout << "3" << endl;
-		double wave_length_var[16] = {32.5866/100, 32.5777, 32.5689, 32.56, 32.5512, 32.5424, 32.5336, 32.5247, 32.5159, 32.5071, 32.4983, 32.4895, 32.4807, 32.4719, 32.4631, 32.4544}; // 波长，cm
+		// cout << "3" << endl;
+		double wave_length_var[16] = {32.5866 / 100, 32.5777, 32.5689, 32.56, 32.5512, 32.5424, 32.5336, 32.5247, 32.5159, 32.5071, 32.4983, 32.4895, 32.4807, 32.4719, 32.4631, 32.4544}; // 波长，cm
 		/*左右天线前一时刻相位*/
-		RowVectorXd PF_distance_left_antenna(PF_count);	 // 行向量
-		RowVectorXd PF_distance_right_antenna(PF_count); // 行向量
-		PF_distance_left_antenna = ((PF_particle.row(0).array() - leftTagDataArray->at(leftStart).x).array().pow(2) + (PF_particle.row(1).array() - leftTagDataArray->at(leftStart).y).array().pow(2)).cwiseSqrt().array() * 2;
-		PF_distance_right_antenna = ((rightTagDataArray->at(rightStart).x - PF_particle.row(0).array()).array().pow(2) + (rightTagDataArray->at(rightStart).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
-		PF_particle.row(2) = ((PF_distance_left_antenna.array() / wave_length_var[0]) - (PF_distance_left_antenna.array() / wave_length_var[0]).floor()).array() * 2 * PI;
-		PF_particle.row(5) = ((PF_distance_right_antenna.array() / wave_length_var[0]) - (PF_distance_right_antenna.array() / wave_length_var[0]).floor()).array() * 2 * PI;
-		//cout << "3.1" << endl;
+		RowVectorXd PF_distance_left_antenna_last(PF_count);	  // 行向量
+		RowVectorXd PF_distance_right_antenna_last(PF_count);  // 行向量
+		RowVectorXd PF_distance_left_antenna_now(PF_count);  // 行向量
+		RowVectorXd PF_distance_right_antenna_now(PF_count); // 行向量
+		PF_distance_left_antenna_last= ((PF_particle.row(0).array() - leftTagDataArray->at(leftStart).x).array().pow(2) + (PF_particle.row(1).array() - leftTagDataArray->at(leftStart).y).array().pow(2)).cwiseSqrt().array() * 2;
+		PF_distance_left_antenna_last = ((rightTagDataArray->at(rightStart).x - PF_particle.row(0).array()).array().pow(2) + (rightTagDataArray->at(rightStart).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
+		PF_particle.row(2) = ((PF_distance_left_antenna_last.array() / wave_length_var[0]) - (PF_distance_left_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
+		PF_particle.row(5) = ((PF_distance_right_antenna_last.array() / wave_length_var[0]) - (PF_distance_right_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "预测上一时刻左天线解缠相位为 " << PF_distance_left_antenna_last.array() / wave_length_var[0] * 2 * PI << endl;
+		cout << "PF_particle.row(2): " << PF_particle.row(2) << endl;
+		cout << "预测上一时刻右天线解缠相位为 " << PF_distance_right_antenna_last.array() / wave_length_var[0] * 2 * PI << endl;
+		cout << "PF_particle.row(5): " << PF_particle.row(5) << endl;
+
 		///*左右天线当前时刻相位*/
-		PF_distance_left_antenna = ((leftTagDataArray->at(leftEnd).x - PF_particle.row(0).array()).array().pow(2) + (leftTagDataArray->at(leftEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
-		PF_distance_right_antenna = ((rightTagDataArray->at(rightEnd).x - PF_particle.row(0).array()).array().pow(2) + (rightTagDataArray->at(rightEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
-		PF_particle.row(3) = ((PF_distance_left_antenna.array() / wave_length_var[0]) - (PF_distance_left_antenna.array() / wave_length_var[0]).floor()) * 2 * PI;
-		PF_particle.row(6) = ((PF_distance_right_antenna.array() / wave_length_var[0]) - (PF_distance_right_antenna.array() / wave_length_var[0]).floor()) * 2 * PI;
-		//cout << "3.2" << endl;
+		PF_distance_left_antenna_now = ((leftTagDataArray->at(leftEnd).x - PF_particle.row(0).array()).array().pow(2) + (leftTagDataArray->at(leftEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
+		PF_distance_right_antenna_now = ((rightTagDataArray->at(rightEnd).x - PF_particle.row(0).array()).array().pow(2) + (rightTagDataArray->at(rightEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
+
+		PF_particle.row(3) = ((PF_distance_left_antenna_now.array() / wave_length_var[0]) - (PF_distance_left_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
+		PF_particle.row(6) = ((PF_distance_right_antenna_now.array() / wave_length_var[0]) - (PF_distance_right_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "预测当前时刻左天线解缠相位为 " << PF_distance_left_antenna_now.array() / wave_length_var[0] * 2 * PI << endl;
+		cout << "PF_particle.row(3): " << PF_particle.row(3) << endl;
+		cout << "预测当前时刻右天线解缠相位为 " << PF_distance_right_antenna_now.array() / wave_length_var[0] * 2 * PI << endl;
+		cout << "PF_particle.row(6): " << PF_particle.row(6) << endl;
+
 		///*左右天线当前相位梯度*/
 		RowVectorXd k(PF_count);
 		k = ((PF_particle.row(3) - PF_particle.row(2)).array() / (2 * PI)).round();
@@ -382,12 +395,17 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		k = ((PF_particle.row(6) - PF_particle.row(5)).array() / (2 * PI)).round();
 		PF_particle.row(7) = PF_particle.row(6).array() - 2 * PI * k.array();
 		PF_particle.row(7) = PF_particle.row(7).array() - PF_particle.row(5).array();
-		//cout << "3.3" << endl;
+		cout << "PF_predict_left:" << PF_distance_left_antenna_now.array() / wave_length_var[0] * 2 * PI - PF_distance_left_antenna_last.array() / wave_length_var[0] * 2 * PI;
+		cout << "PF_predict_right:" << PF_distance_right_antenna_now.array() / wave_length_var[0] * 2 * PI - PF_distance_right_antenna_last.array() / wave_length_var[0] * 2* PI;
+		// cout << "3.3" << endl;
 		/*实际观测相位梯度*/
 		double PF_observe_left = phase_pos_left_antenna(leftEnd) - phase_pos_left_antenna(leftStart);
 		double PF_observe_right = phase_pos_right_antenna(rightEnd) - phase_pos_right_antenna(rightStart);
-		cout<<"PF_observe_left: "<<PF_observe_left<<endl;
-		cout<<"PF_observe_right: "<<PF_observe_right<<endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "实际观测左天线解缠相位为 " << PF_observe_left << endl;
+		cout << "PF_observe_left: " << PF_observe_left << "	phase_pos_left_antenna(leftEnd)=" << phase_pos_left_antenna(leftEnd) << "	phase_pos_left_antenna(leftStart)=" << phase_pos_left_antenna(leftStart) << endl;
+		cout << "实际观测右天线解缠相位为 " << PF_observe_right << endl;
+		cout << "PF_observe_right: " << PF_observe_right << "		phase_pos_right_antenna(rightEnd)=" << phase_pos_right_antenna(rightEnd) << "	phase_pos_right_antenna(rightStart)=" << phase_pos_right_antenna(rightStart) << endl;
 		/*粒子权重评估*/
 		PF_distance.row(0) = PF_particle.row(4).array() - PF_observe_left;
 		PF_w.row(0) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(0).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
@@ -396,9 +414,9 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 		PF_w.row(1) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(1).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
 
 		PF_w.row(2) = PF_w.row(0).array() * PF_w.row(1).array(); // 综合权重
-		cout<<"PF_distance.row(0): "<<PF_distance.row(0)<<endl;
-		cout<<"PF_distance.row(1): "<<PF_distance.row(1)<<endl;
-		//cout << "4" << endl;
+		cout << "PF_distance.row(0): " << PF_distance.row(0) << endl;
+		cout << "PF_distance.row(1): " << PF_distance.row(1) << endl;
+		// cout << "4" << endl;
 		/*重采样*/
 		MatrixXd PF_particle_new(8, PF_count);
 		int index = (((double)rand()) / RAND_MAX) * (PF_count - 1) + 0; // 生成0 - （PF_count-1） 的随机数
@@ -415,11 +433,13 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 			PF_particle_new.col(j) = PF_particle.col(index);
 		}
 		PF_particle = PF_particle_new;
-		//cout << "5" << endl;
+		// cout << "5" << endl;
 		///*定位结果*/
 		PF_center_mean(0, i) = PF_particle.block(0, 0, 1, PF_count).sum() / PF_count; // 计算粒子的x轴坐标均值
 		PF_center_mean(1, i) = PF_particle.block(1, 0, 1, PF_count).sum() / PF_count; // 计算粒子的y轴坐标均值
-		cout<<"第"<<i<<"次定位结果为:x="<<PF_center_mean(0, i)<<" y="<<PF_center_mean(1, i)<<endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "第" << i << "次定位结果为:x=" << PF_center_mean(0, i) << " y=" << PF_center_mean(1, i) << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
 		int num = 5;
 
 		if (i >= num - 1)
@@ -445,8 +465,8 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 
 				// double tag_estimation_relative_x_0 = (tag_estimation_real_x(i) - robot_xt[i])*cos(-robot_tht[i]) - (tag_estimation_real_y(i) - robot_yt[i])*sin(-robot_tht[i]);
 				// double tag_estimation_relative_y_0 = (tag_estimation_real_x(i) - robot_xt[i])*sin(-robot_tht[i]) + (tag_estimation_real_y(i) - robot_yt[i])*cos(-robot_tht[i]);
-				cout<<"机器人位姿为，x= "<<robot_xt[i]<<" y= "<<robot_yt[i]<<" th= "<<robot_tht[i]<<endl;
-				cout<<"标签绝对位置，x= "<<PF_center_mean(0, i)<<" y= "<<PF_center_mean(1, i)<<endl;
+				cout << "机器人位姿为，x= " << robot_xt[i] << " y= " << robot_yt[i] << " th= " << robot_tht[i] << endl;
+				cout << "标签绝对位置，x= " << PF_center_mean(0, i) << " y= " << PF_center_mean(1, i) << endl;
 				cout << "标签相对位置，x= " << tag_estimation_relative_x(i) << "y=" << tag_estimation_relative_y(i) << endl;
 
 				// 求解标签在机器人坐标系下的极坐标
@@ -454,9 +474,9 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 				tag_beta(i) = atan(abs(tag_estimation_relative_y(i) / tag_estimation_relative_x(i)));
 
 				cout << "当前处于定位稳定阶段，i= " << i << endl;
-				cout<<"极距为"<<tag_distance(i)<<endl;
-				cout<<"极角为"<<tag_beta(i)<<endl;
-				
+				cout << "极距为" << tag_distance(i) << endl;
+				cout << "极角为" << tag_beta(i) << endl;
+
 				// 判定是否达到目标
 				// if (abs(tag_estimation_relative_x(i) - tag_target_relative_x) > 10 || (abs(tag_target_relative_y - tag_estimation_relative_y(i)) > 10))
 				if (((tag_distance(i) > tag_distance_threshold)) && (tag_estimation_relative_x(i) > tag_target_relative_x))
@@ -468,9 +488,13 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 					robot_vx(i) = 0.05;
 					// robot_vy(i) = 0;
 					robot_w(i) = 0;
+					if (tag_beta(i) < -tag_beta_threshold)
+					{
+						robot_w(i) = 0.02;
+					}
 					if (tag_beta(i) > tag_beta_threshold)
 					{
-						robot_w(i) = 0.05;
+						robot_w(i) = -0.02;
 					}
 				}
 				else
@@ -501,7 +525,6 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 	cout << "Info: loop finished" << endl;
 	return make_tuple(robot_vx(i), robot_w(i));
 }
-
 
 // tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, vector<TagData>* rightTagDataArray, OdomData odom, int i)
 // {
@@ -697,7 +720,7 @@ tuple<double, double> Controller::getMotion(vector<TagData>* leftTagDataArray, v
 // 		/*确定最后一个有效测量点的下标*/
 // 		int leftEnd = left_index_mapping[i];
 // 		int rightEnd = right_index_mapping[i];
-		
+
 // 		while (!leftTagDataArray[leftEnd].isAssignedPose)
 // 		{
 // 			leftEnd--;
