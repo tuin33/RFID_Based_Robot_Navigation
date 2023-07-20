@@ -370,10 +370,10 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		PF_particle.row(2) = ((PF_distance_left_antenna_last.array() / wave_length_var[0]) - (PF_distance_left_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
 		PF_particle.row(5) = ((PF_distance_right_antenna_last.array() / wave_length_var[0]) - (PF_distance_right_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
 		cout << "-------------------------------------------------------------------------------------" << endl;
-		cout << "预测上一时刻左天线解缠相位为 " << PF_distance_left_antenna_last.array() / wave_length_var[0] * 2 * PI << endl;
-		cout << "PF_particle.row(2): " << PF_particle.row(2) << endl;
-		cout << "预测上一时刻右天线解缠相位为 " << PF_distance_right_antenna_last.array() / wave_length_var[0] * 2 * PI << endl;
-		cout << "PF_particle.row(5): " << PF_particle.row(5) << endl;
+		cout << "预测上一时刻左天线解缠相位为 " << PF_distance_left_antenna_last.array().sum() / wave_length_var[0]/PF_count * 2 * PI << endl;
+		cout << "PF_particle.row(2): " << PF_particle.row(2).sum() /PF_count << endl;
+		cout << "预测上一时刻右天线解缠相位为 " << PF_distance_right_antenna_last.array().sum() / wave_length_var[0]/PF_count * 2 * PI << endl;
+		cout << "PF_particle.row(5): " << PF_particle.row(5).sum() /PF_count << endl;
 
 		///*左右天线当前时刻相位*/
 		PF_distance_left_antenna_now = ((leftTagDataArray->at(leftEnd).x - PF_particle.row(0).array()).array().pow(2) + (leftTagDataArray->at(leftEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
@@ -382,10 +382,10 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		PF_particle.row(3) = ((PF_distance_left_antenna_now.array() / wave_length_var[0]) - (PF_distance_left_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
 		PF_particle.row(6) = ((PF_distance_right_antenna_now.array() / wave_length_var[0]) - (PF_distance_right_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
 		cout << "-------------------------------------------------------------------------------------" << endl;
-		cout << "预测当前时刻左天线解缠相位为 " << PF_distance_left_antenna_now.array() / wave_length_var[0] * 2 * PI << endl;
-		cout << "PF_particle.row(3): " << PF_particle.row(3) << endl;
-		cout << "预测当前时刻右天线解缠相位为 " << PF_distance_right_antenna_now.array() / wave_length_var[0] * 2 * PI << endl;
-		cout << "PF_particle.row(6): " << PF_particle.row(6) << endl;
+		cout << "预测当前时刻左天线解缠相位为 " << PF_distance_left_antenna_now.array().sum() / wave_length_var[0] /PF_count* 2 * PI << endl;
+		cout << "PF_particle.row(3): " << PF_particle.row(3).sum() /PF_count << endl;
+		cout << "预测当前时刻右天线解缠相位为 " << PF_distance_right_antenna_now.array() .sum()/ wave_length_var[0]/PF_count * 2 * PI << endl;
+		cout << "PF_particle.row(6): " << PF_particle.row(6).sum() /PF_count << endl;
 
 		///*左右天线当前相位梯度*/
 		RowVectorXd k(PF_count);
@@ -395,17 +395,17 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		k = ((PF_particle.row(6) - PF_particle.row(5)).array() / (2 * PI)).round();
 		PF_particle.row(7) = PF_particle.row(6).array() - 2 * PI * k.array();
 		PF_particle.row(7) = PF_particle.row(7).array() - PF_particle.row(5).array();
-		cout << "PF_predict_left:" << PF_distance_left_antenna_now.array() / wave_length_var[0] * 2 * PI - PF_distance_left_antenna_last.array() / wave_length_var[0] * 2 * PI;
-		cout << "PF_predict_right:" << PF_distance_right_antenna_now.array() / wave_length_var[0] * 2 * PI - PF_distance_right_antenna_last.array() / wave_length_var[0] * 2* PI;
+		cout << "预测左天线解缠相位为 " << PF_particle.row(4).sum()/PF_count  << endl;
+		cout << "预测右天线解缠相位为" << PF_particle.row(7).sum()/PF_count  << endl;
 		// cout << "3.3" << endl;
 		/*实际观测相位梯度*/
 		double PF_observe_left = phase_pos_left_antenna(leftEnd) - phase_pos_left_antenna(leftStart);
 		double PF_observe_right = phase_pos_right_antenna(rightEnd) - phase_pos_right_antenna(rightStart);
 		cout << "-------------------------------------------------------------------------------------" << endl;
 		cout << "实际观测左天线解缠相位为 " << PF_observe_left << endl;
-		cout << "PF_observe_left: " << PF_observe_left << "	phase_pos_left_antenna(leftEnd)=" << phase_pos_left_antenna(leftEnd) << "	phase_pos_left_antenna(leftStart)=" << phase_pos_left_antenna(leftStart) << endl;
+		cout <<"phase_pos_left_antenna(leftEnd)=" << phase_pos_left_antenna(leftEnd) << "	phase_pos_left_antenna(leftStart)=" << phase_pos_left_antenna(leftStart) << endl;
 		cout << "实际观测右天线解缠相位为 " << PF_observe_right << endl;
-		cout << "PF_observe_right: " << PF_observe_right << "		phase_pos_right_antenna(rightEnd)=" << phase_pos_right_antenna(rightEnd) << "	phase_pos_right_antenna(rightStart)=" << phase_pos_right_antenna(rightStart) << endl;
+		cout << "phase_pos_right_antenna(rightEnd)=" << phase_pos_right_antenna(rightEnd) << "	phase_pos_right_antenna(rightStart)=" << phase_pos_right_antenna(rightStart) << endl;
 		/*粒子权重评估*/
 		PF_distance.row(0) = PF_particle.row(4).array() - PF_observe_left;
 		PF_w.row(0) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(0).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
@@ -414,8 +414,9 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		PF_w.row(1) = (1 / sqrt(2 * PF_R) / sqrt(2 * PI)) * (-PF_distance.row(1).array().pow(2).array() / (4 * PF_R)).array().exp(); // 求权重
 
 		PF_w.row(2) = PF_w.row(0).array() * PF_w.row(1).array(); // 综合权重
-		cout << "PF_distance.row(0): " << PF_distance.row(0) << endl;
-		cout << "PF_distance.row(1): " << PF_distance.row(1) << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "PF_distance_x_mean" << PF_distance.row(0).sum() /PF_count<< endl;
+		cout << "PF_distance_y_mean: " << PF_distance.row(1).sum() /PF_count<< endl;
 		// cout << "4" << endl;
 		/*重采样*/
 		MatrixXd PF_particle_new(8, PF_count);
