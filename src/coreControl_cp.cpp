@@ -212,12 +212,14 @@ void multiThreadListener::chatterCallback2(const RFID_Based_Robot_Navigation::rf
 }
 
 void multiThreadListener::loopCalculate(){
-    ros::Rate loop_rate(2);
+    ros::Rate loop_rate(10);
     while (ros::ok())
     {
-        if(control.iteration_count < 500)
-        {
-            tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom, control.iteration_count);
+        if(control.iteration_count < 2000)
+        {   
+            if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5)
+                continue;
+            tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
             double linear_x = get<0>(motion);
             double angular = get<1>(motion);
             // Tempolimits einhalten
@@ -242,6 +244,8 @@ void multiThreadListener::loopCalculate(){
             control.vel_msg.linear.x = linear_x;
             control.vel_msg.angular.z = angular;
             ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
+            if(linear_x==0 && angular==0)
+                break; 
             // leftTagDataArray.clear();
             // rightTagDataArray.clear();
             control.iteration_count++;
@@ -251,9 +255,11 @@ void multiThreadListener::loopCalculate(){
             control.vel_msg.linear.x = 0.0;
             control.vel_msg.angular.z = 0.0;
             ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
+            break;
         }
         motion_publish.publish(control.vel_msg);
         loop_rate.sleep();
+
     }
 }
 

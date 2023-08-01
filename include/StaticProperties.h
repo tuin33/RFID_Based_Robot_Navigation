@@ -13,6 +13,7 @@
 #define	RIGHT_READER_ID			2									//右读写器ID
 
 #define	TARGET_TAG_EPC			"E280-1160-6000-0210-BE88-B02F"		//目标标签EPC	3008-33B2-DDD9-0140-2018-0118
+//#define TARGET_TAG_EPC          "E200-001A-0411-0175-1050-96C3"
 #define ARRAY_SIZE				1000000								//保存数组的大小
 
 #define PI						3.1415926
@@ -30,10 +31,10 @@
 #define	sample_total_len		20.0/100									//初始的采样长度，m
 #define phase_grade_len			6.0/100									//相位梯度对应的物理距离，m
 
-#define	tag_target_relative_x	10.0/100								//m
+#define	tag_target_relative_x	5.0/100								//m
 #define tag_target_relative_y	0.0									//m
 
-#define tag_distance_threshold  40.0/100				//m
+#define tag_distance_threshold  30.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
 #define	robot_translational_vel0	2.0/100								//m/s
