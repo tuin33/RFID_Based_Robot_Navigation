@@ -349,7 +349,7 @@ int CMyApplication::run(
 								if (0 == startROSpec())
 								{
 									rc = 7;
-									if (0 == awaitAndPrintReport(0.1)) // timeout(seconds)
+									if (0 == awaitAndPrintReport(10)) // timeout(seconds)
 									{
 										rc = 8;
 										if (0 == stopROSpec())
@@ -359,157 +359,212 @@ int CMyApplication::run(
 									}
 								}
 
-								// data preprocess
-								int searchFlag;
-
-								// process ant1
-								int cnt1 = 0;
-								for (auto it1 = antDataVec1.begin(); it1 != antDataVec1.end(); it1++)
+								char fileName1[200] = {0};
+								std::ofstream data;
+								// sprintf(fileName1, "//home//tzq//data//test//nav//RFIDdata_left.txt");
+								sprintf(fileName1, "//home//tzq//data//RFIDdata_left.txt");
+								if (data.fail())
 								{
-									if (dataset.empty())
-									{
-										EPC epc_new;
-										strcpy(epc_new.epc, (*it1).epc);
-										epc_new.reader.readerID = 1;
-										epc_new.reader.ant1.antennaId = 1;
-										epc_new.reader.ant1.phase.push_back((*it1).phase);
-										epc_new.reader.ant1.rssi.push_back((*it1).rssi);
-										epc_new.reader.ant1.timestamp.push_back((*it1).timestamp_pc);
-										dataset.push_back(epc_new);
-									}
-									else
-									{
-										searchFlag = 0;
-										for (auto it = dataset.begin(); it != dataset.end(); it++)
-										{
-											if (strcmp((*it1).epc, (*it).epc) == 0)
-											{
-												searchFlag = 1;
-												(*it).reader.ant1.phase.push_back((*it1).phase);
-												(*it).reader.ant1.rssi.push_back((*it1).rssi);
-												(*it).reader.ant1.timestamp.push_back((*it1).timestamp_pc);
-											}
-											else
-											{
-												continue;
-											}
-										}
-										if (!searchFlag)
-										{
-											EPC epc_new;
-											strcpy(epc_new.epc, (*it1).epc);
-											epc_new.reader.readerID = 1;
-											epc_new.reader.ant1.antennaId = 1;
-											epc_new.reader.ant1.phase.push_back((*it1).phase);
-											epc_new.reader.ant1.rssi.push_back((*it1).rssi);
-											epc_new.reader.ant1.timestamp.push_back((*it1).timestamp_pc);
-											dataset.push_back(epc_new);
-										}
-									}
-									// std::cout << (*it1).epc << " " << (*it1).phase << " " <<std::fixed<< timeVec1[cnt1]<< " "<< (*it1).rssi << std::endl;
-									cnt1++;
+									ROS_INFO("Open file 1 failed");
 								}
-
-								std::cout << dataset[0].epc << " " << dataset[0].reader.ant1.phase.size() << std::endl;
-
-								// process ant2
-								int cnt2 = 0;
-								for (auto it2 = antDataVec2.begin(); it2 != antDataVec2.end(); it2++)
+								else
 								{
-									if (dataset.empty())
+									data.open(fileName1, std::ios::out);
+									// ROS_INFO("file 1 is open");
+									int cnt1 = 0;
+									for (int i = 0; i < antDataVec1.size(); i++)
 									{
-										EPC epc_new;
-										strcpy(epc_new.epc, (*it2).epc);
-										epc_new.reader.readerID = 1;
-										epc_new.reader.ant2.antennaId = 2;
-										epc_new.reader.ant2.phase.push_back((*it2).phase);
-										epc_new.reader.ant2.rssi.push_back((*it2).rssi);
-										epc_new.reader.ant2.timestamp.push_back((*it2).timestamp_pc);
-										dataset.push_back(epc_new);
-									}
-									else
-									{
-										searchFlag = 0;
-										for (auto it = dataset.begin(); it != dataset.end(); it++)
+										// invert from char[] to string
+										std::string epcBuffer;
+										for (int j = 0; j < 29; j++)
 										{
-											if (strcmp((*it2).epc, (*it).epc) == 0)
-											{
-												searchFlag = 1;
-												(*it).reader.ant2.antennaId = 2;
-												(*it).reader.ant2.phase.push_back((*it2).phase);
-												(*it).reader.ant2.rssi.push_back((*it2).rssi);
-												(*it).reader.ant2.timestamp.push_back((*it2).timestamp_pc);
-											}
-											else
-											{
-												continue;
-											}
+											epcBuffer += antDataVec1[i].epc[j];
 										}
-										if (!searchFlag)
-										{
-											EPC epc_new;
-											strcpy(epc_new.epc, (*it2).epc);
-											epc_new.reader.readerID = 1;
-											epc_new.reader.ant2.antennaId = 2;
-											epc_new.reader.ant2.phase.push_back((*it2).phase);
-											epc_new.reader.ant2.rssi.push_back((*it2).rssi);
-											epc_new.reader.ant2.timestamp.push_back((*it2).timestamp_pc);
-											dataset.push_back(epc_new);
-										}
-										// std::cout << (*it2).epc << " " << (*it2).phase << " " <<std::fixed<< timeVec2[cnt2]<< " "<< (*it2).rssi << std::endl;
-										cnt2++;
+										data << std::fixed << epcBuffer << "," << antDataVec1[i].phase << "," << antDataVec1[i].rssi << "," << antDataVec1[i].timestamp_pc <<  "," << antDataVec1[i].timestamp << std::endl;
 									}
+									data.close();
 								}
 
 								antDataVec1.clear();
-								antDataVec2.clear();
-								timeVec1.clear();
-								timeVec2.clear();
 
-								// publish messages
-								for (auto it = dataset.begin(); it != dataset.end(); it++)
+								char fileName2[200] = {0};
+								std::ofstream data1;
+								// sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+								sprintf(fileName2, "//home//tzq//data//RFIDdata_right.txt");
+								if (data1.fail())
 								{
-
-									// pub data from ant1
-									RFID_Based_Robot_Navigation::RFIDdata msg1;
-									RFID_Based_Robot_Navigation::RFIDdata msg2;
-
-									msg1.epc = (*it).epc;
-									msg2.epc = (*it).epc;
-
-									msg1.antID = (*it).reader.ant1.antennaId;
-									msg2.antID = (*it).reader.ant2.antennaId;
-
-									int cnt1 = 0;
-									for (auto it1 = (*it).reader.ant1.phase.begin(); it1 != (*it).reader.ant1.phase.end(); it1++)
-									{
-										msg1.phase.push_back((*it1));
-										msg1.timestamp.push_back((*it).reader.ant1.timestamp[cnt1]);
-										cnt1++;
-									}
-
+									ROS_INFO("Open file 2 failed");
+								}
+								else
+								{
+									data1.open(fileName2, std::ios::out);
+									// ROS_INFO("file 2 is open");
 									int cnt2 = 0;
-									for (auto it2 = (*it).reader.ant2.phase.begin(); it2 != (*it).reader.ant2.phase.end(); it2++)
+									for (int i = 0; i < antDataVec2.size(); i++)
 									{
-										msg2.phase.push_back((*it2));
-										msg2.timestamp.push_back((*it).reader.ant2.timestamp[cnt2]);
-										cnt2++;
+										std::string epcBuffer;
+										for (int j = 0; j < 29; j++)
+										{
+											epcBuffer += antDataVec2[i].epc[j];
+										}
+										data1<< std::fixed << epcBuffer << "," << antDataVec2[i].phase << "," << antDataVec2[i].rssi << "," << antDataVec2[i].timestamp_pc <<  "," << antDataVec2[i].timestamp << std::endl;
 									}
-									pub1.publish(msg1);
-
-									printf("INFO: publish msg1 of tag %d finished\n", msg1.phase.size());
-									rate_20hz.sleep();
-									pub1.publish(msg2);
-									printf("INFO: publish msg2 of tag %d finished\n", msg2.phase.size());
-									rate_20hz.sleep();
-									// send ending message
-									RFID_Based_Robot_Navigation::sendEnding msg;
-									msg.sendFlag = 1;
-									pub2.publish(msg);
-									printf("INFO: Send ending msg finished\n");
+									data1.close();
 								}
 
-								dataset.clear();
+								antDataVec2.clear();
+
+								// data preprocess
+								// int searchFlag;
+
+								// // process ant1
+								// int cnt1 = 0;
+								// for (auto it1 = antDataVec1.begin(); it1 != antDataVec1.end(); it1++)
+								// {
+								// 	if (dataset.empty())
+								// 	{
+								// 		EPC epc_new;
+								// 		strcpy(epc_new.epc, (*it1).epc);
+								// 		epc_new.reader.readerID = 1;
+								// 		epc_new.reader.ant1.antennaId = 1;
+								// 		epc_new.reader.ant1.phase.push_back((*it1).phase);
+								// 		epc_new.reader.ant1.rssi.push_back((*it1).rssi);
+								// 		epc_new.reader.ant1.timestamp.push_back((*it1).timestamp_pc);
+								// 		dataset.push_back(epc_new);
+								// 	}
+								// 	else
+								// 	{
+								// 		searchFlag = 0;
+								// 		for (auto it = dataset.begin(); it != dataset.end(); it++)
+								// 		{
+								// 			if (strcmp((*it1).epc, (*it).epc) == 0)
+								// 			{
+								// 				searchFlag = 1;
+								// 				(*it).reader.ant1.phase.push_back((*it1).phase);
+								// 				(*it).reader.ant1.rssi.push_back((*it1).rssi);
+								// 				(*it).reader.ant1.timestamp.push_back((*it1).timestamp_pc);
+								// 			}
+								// 			else
+								// 			{
+								// 				continue;
+								// 			}
+								// 		}
+								// 		if (!searchFlag)
+								// 		{
+								// 			EPC epc_new;
+								// 			strcpy(epc_new.epc, (*it1).epc);
+								// 			epc_new.reader.readerID = 1;
+								// 			epc_new.reader.ant1.antennaId = 1;
+								// 			epc_new.reader.ant1.phase.push_back((*it1).phase);
+								// 			epc_new.reader.ant1.rssi.push_back((*it1).rssi);
+								// 			epc_new.reader.ant1.timestamp.push_back((*it1).timestamp_pc);
+								// 			dataset.push_back(epc_new);
+								// 		}
+								// 	}
+								// 	// std::cout << (*it1).epc << " " << (*it1).phase << " " <<std::fixed<< timeVec1[cnt1]<< " "<< (*it1).rssi << std::endl;
+								// 	cnt1++;
+								// }
+
+								// std::cout << dataset[0].epc << " " << dataset[0].reader.ant1.phase.size() << std::endl;
+
+								// // process ant2
+								// int cnt2 = 0;
+								// for (auto it2 = antDataVec2.begin(); it2 != antDataVec2.end(); it2++)
+								// {
+								// 	if (dataset.empty())
+								// 	{
+								// 		EPC epc_new;
+								// 		strcpy(epc_new.epc, (*it2).epc);
+								// 		epc_new.reader.readerID = 1;
+								// 		epc_new.reader.ant2.antennaId = 2;
+								// 		epc_new.reader.ant2.phase.push_back((*it2).phase);
+								// 		epc_new.reader.ant2.rssi.push_back((*it2).rssi);
+								// 		epc_new.reader.ant2.timestamp.push_back((*it2).timestamp_pc);
+								// 		dataset.push_back(epc_new);
+								// 	}
+								// 	else
+								// 	{
+								// 		searchFlag = 0;
+								// 		for (auto it = dataset.begin(); it != dataset.end(); it++)
+								// 		{
+								// 			if (strcmp((*it2).epc, (*it).epc) == 0)
+								// 			{
+								// 				searchFlag = 1;
+								// 				(*it).reader.ant2.antennaId = 2;
+								// 				(*it).reader.ant2.phase.push_back((*it2).phase);
+								// 				(*it).reader.ant2.rssi.push_back((*it2).rssi);
+								// 				(*it).reader.ant2.timestamp.push_back((*it2).timestamp_pc);
+								// 			}
+								// 			else
+								// 			{
+								// 				continue;
+								// 			}
+								// 		}
+								// 		if (!searchFlag)
+								// 		{
+								// 			EPC epc_new;
+								// 			strcpy(epc_new.epc, (*it2).epc);
+								// 			epc_new.reader.readerID = 1;
+								// 			epc_new.reader.ant2.antennaId = 2;
+								// 			epc_new.reader.ant2.phase.push_back((*it2).phase);
+								// 			epc_new.reader.ant2.rssi.push_back((*it2).rssi);
+								// 			epc_new.reader.ant2.timestamp.push_back((*it2).timestamp_pc);
+								// 			dataset.push_back(epc_new);
+								// 		}
+								// 		// std::cout << (*it2).epc << " " << (*it2).phase << " " <<std::fixed<< timeVec2[cnt2]<< " "<< (*it2).rssi << std::endl;
+								// 		cnt2++;
+								// 	}
+								// }
+
+								// antDataVec1.clear();
+								// antDataVec2.clear();
+								// timeVec1.clear();
+								// timeVec2.clear();
+
+								// // publish messages
+								// for (auto it = dataset.begin(); it != dataset.end(); it++)
+								// {
+
+								// 	// pub data from ant1
+								// 	RFID_Based_Robot_Navigation::RFIDdata msg1;
+								// 	RFID_Based_Robot_Navigation::RFIDdata msg2;
+
+								// 	msg1.epc = (*it).epc;
+								// 	msg2.epc = (*it).epc;
+
+								// 	msg1.antID = (*it).reader.ant1.antennaId;
+								// 	msg2.antID = (*it).reader.ant2.antennaId;
+
+								// 	int cnt1 = 0;
+								// 	for (auto it1 = (*it).reader.ant1.phase.begin(); it1 != (*it).reader.ant1.phase.end(); it1++)
+								// 	{
+								// 		msg1.phase.push_back((*it1));
+								// 		msg1.timestamp.push_back((*it).reader.ant1.timestamp[cnt1]);
+								// 		cnt1++;
+								// 	}
+
+								// 	int cnt2 = 0;
+								// 	for (auto it2 = (*it).reader.ant2.phase.begin(); it2 != (*it).reader.ant2.phase.end(); it2++)
+								// 	{
+								// 		msg2.phase.push_back((*it2));
+								// 		msg2.timestamp.push_back((*it).reader.ant2.timestamp[cnt2]);
+								// 		cnt2++;
+								// 	}
+								// 	pub1.publish(msg1);
+
+								// 	printf("INFO: publish msg1 of tag %d finished\n", msg1.phase.size());
+								// 	rate_20hz.sleep();
+								// 	pub1.publish(msg2);
+								// 	printf("INFO: publish msg2 of tag %d finished\n", msg2.phase.size());
+								// 	rate_20hz.sleep();
+								// 	// send ending message
+								// 	RFID_Based_Robot_Navigation::sendEnding msg;
+								// 	msg.sendFlag = 1;
+								// 	pub2.publish(msg);
+								// 	printf("INFO: Send ending msg finished\n");
+								// }
+
+								// dataset.clear();
 							}
 						}
 					}

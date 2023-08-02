@@ -12,7 +12,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "rfid_node_start");
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<RFID_Based_Robot_Navigation::rfid_msgs>("/rfid_msgs", 1000);
-    char *pReaderHostName = "192.168.0.105";
+    char *pReaderHostName = "115.156.142.223";
 
     // CMyApplication::instance = CMyApplication(pReaderHostName);
     CMyApplication myApp(pReaderHostName);

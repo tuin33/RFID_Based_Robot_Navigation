@@ -475,7 +475,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 				std_y = sqrt((PF_center_mean.block(1, i - num + 1, 1, num).array() - mean_y).array().pow(2).sum() / (num));
 			}
 
-			if ((i > 80) && ((location_state == 1) || ((std_x < 0.1) && (std_y < 0.1)))) // 定位稳定性判断
+			if (((i > 100) && (location_state == 1)) || ( (std_x < 0.05) && (std_y < 0.05 ) ) )  // 定位稳定性判断
 			{
 				cout << "Location stable." << endl;
 				location_state = 1;
@@ -500,26 +500,27 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 
 				// 判定是否达到目标
 				// if (abs(tag_estimation_relative_x(i) - tag_target_relative_x) > 10 || (abs(tag_target_relative_y - tag_estimation_relative_y(i)) > 10))
-				if (((tag_distance(i) > tag_distance_threshold)) && (tag_estimation_relative_x(i) > tag_target_relative_x))
+				//if (((tag_distance(i) > tag_distance_threshold)) && (tag_estimation_relative_x(i) > tag_target_relative_x))
+				if (((tag_distance(i) > tag_distance_threshold)) || abs(tag_beta(i))  > 5*PI/180)
 				{
 					cout << "Controlling ..." << endl;
 					// robot_vx(i)= pid_x_compute(robot_xt[i], PF_center_mean(0, i) );
 					// //robot_vy(i)  = pid_y_compute(robot_yt[i],PF_center_mean(1, i) );
 					// robot_w(i)  = pid_angle_compute(robot_tht[i], tag_beta(i));
-					robot_vx(i) = 0.07;
+					robot_vx(i) = 0.15;
 					// robot_vy(i) = 0;
 					robot_w(i) = 0;
 					if (tag_beta(i) < -tag_beta_threshold)
 					{
-						robot_w(i) = -0.1;
+						robot_w(i) = -0.12;
 					}
 					if (tag_beta(i) > tag_beta_threshold)
 					{
-						robot_w(i) = 0.1;
+						robot_w(i) = 0.12;
 					}
 				}
 				else if (sqrt(pow(robot_xt[i],2)+pow(robot_yt[i],2))<=1){
-					robot_vx(i) = 0.04;
+					robot_vx(i) = 0.1;
 				}
 				else
 				{
@@ -533,10 +534,11 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 			{
 				cout << "Location unstable." << endl;
 				location_state = 0;
-				robot_vx(i) = robot_translational_vel0;
+				robot_vx(i) = robot_translational_vel0+i*0.0002;
+				if(robot_vx(i) >0.08)
+					robot_vx(i)=0.08;
 				// robot_vy(i) = 0;
 				robot_w(i) = robot_rotational_vel0;
-				step(i) = -1;
 			}
 		}
 		else

@@ -17,19 +17,19 @@
 
 using namespace std;
 
-void keyboardDetect(bool *flag)
-{
-	int ch;
-	while(1)
-	{
-		ch = getchar();
-		if (ch == 65)
-		{
-			*flag = 1;
-			break;
-		}
-	}
-}
+// void keyboardDetect(bool *flag)
+// {
+// 	int ch;
+// 	while(1)
+// 	{
+// 		ch = getchar();
+// 		if (ch == 65)
+// 		{
+// 			*flag = 1;
+// 			break;
+// 		}
+// 	}
+// }
 
 int main(int argc, char **argv)
 {
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	// initialize Impinj reader
 	char *pReaderHostName;
 
-	pReaderHostName = "192.168.0.105"; //115.156.142.223
+	pReaderHostName = "115.156.142.223"; //115.156.142.223  192.168.0.105
 
 	CMyApplication myApp;
 	myApp.m_Verbose = 1;
@@ -47,10 +47,10 @@ int main(int argc, char **argv)
 
 	int rc;
 
-	ROS_INFO("Ready to read ...");
-	ros::Duration(2).sleep();
+	// ROS_INFO("Ready to read ...");
+	// ros::Duration(2).sleep();
 
-	ros::Rate loop_rate(10);
+	// ros::Rate loop_rate(10);
 
 	rc = myApp.run(pReaderHostName);
 
