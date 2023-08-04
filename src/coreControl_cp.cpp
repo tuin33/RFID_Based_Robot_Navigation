@@ -259,8 +259,86 @@ void multiThreadListener::loopCalculate(){
         }
         motion_publish.publish(control.vel_msg);
         loop_rate.sleep();
-
     }
+     char fileName1[200] = {0};
+    std::ofstream data1;
+    // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName1, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//odom.txt");
+    if (data1.fail())
+    {
+        cout << "File 1 is not open" << endl;
+    }
+    else
+    {
+        data1.open(fileName1, std::ios::out);
+        for (int i = 0; i < control.iteration_count; i++)
+        {
+            data1 << std::fixed << control.robot_xt[i] << " " << control.robot_yt[i] << " " << control.robot_tht[i] << std::endl;
+        }
+        data1.close();
+    }
+
+    std::cout << "Finish writing data! 1" << std::endl;
+
+    char fileName3[200] = {0};
+    std::ofstream data3;
+    // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName3, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_center.txt");
+    if (data3.fail())
+    {
+        cout << "File 3 is not open" << endl;
+    }
+    else
+    {
+        data3.open(fileName3, std::ios::out);
+        for (int i = 0; i < control.iteration_count; i++)
+        {
+            data3 << std::fixed << control.PF_center_mean(0, i) << " " << control.PF_center_mean(1, i) << std::endl;
+        }
+        data3.close();
+    }
+
+    // char fileName2[200] = {0};
+    // std::ofstream data2;
+    // // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    // sprintf(fileName2, "../experiment/result/PF_point_all_after.txt");
+    // if (data2.fail())
+    // {
+    //     cout << "File 2 is not open" << endl;
+    // }
+    // else
+    // {
+    //     data2.open(fileName2, std::ios::out);
+    //     for (int i = 0; i < 491; i++)
+    //     {
+    //         for (int j = 0; j < 1000; j++)
+    //             data2 << std::fixed << control.PF_point_all_x_after[i](0, j) << " " << control.PF_point_all_y_after[i](0, j) << std::endl;
+    //     }
+    //     data2.close();
+    // }
+
+    // std::cout << "Finish writing data! 2" << std::endl;
+
+    char fileName4[400] = {0};
+    std::ofstream data4;
+    // sprintf(fileName4, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName4, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_all.txt");
+    if (data4.fail())
+    {
+        cout << "File 4 is not open" << endl;
+    }
+    else
+    {
+        data4.open(fileName4, std::ios::out);
+        for (int i = 0; i < control.iteration_count; i++)
+        {
+            for (int j = 0; j<1000; j++)
+                data4 << std::fixed << control.PF_point_all_x[i](0, j) << " " << control.PF_point_all_y[i](0, j) << std::endl;
+        }
+        data4.close();
+    }
+
+    std::cout << "Finish writing data! 4" << std::endl;
 }
 
 // call back of stop flag

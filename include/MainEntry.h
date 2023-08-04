@@ -37,7 +37,7 @@ void assignPoseForTagData(TagData *tagData, OdomData odom);
 // PID controller
 class Controller
 {
-private:
+public:
     // ofstream					outfile;
     CMyApplication myReaderApp;
 
@@ -141,7 +141,10 @@ private:
     MatrixXd PF_w=MatrixXd(3, PF_count);        // 粒子与观测值之间的权重因子，第三行用于综合评价
 
     MatrixXd PF_center_mean=MatrixXd(2, 10000); // 保存粒子的中心位置，第一行：x，第二行：y，第三行：前5次定位结果的x轴标准差，第四行：前5次定位结果的x轴标准差
-
+    vector<MatrixXd> PF_point_all_x;
+    vector<MatrixXd> PF_point_all_y;
+    vector<MatrixXd> PF_point_all_x_after;
+    vector<MatrixXd> PF_point_all_y_after;
     // VectorXd totaltime(2000);
     double totaltime[10000];
     /////!!!!!!!
@@ -158,7 +161,6 @@ private:
     double last_error_y_, last_error_sum_y_, last_error_diff_y_ = 0;
     double last_error_angle_, last_error_sum_angle_, last_error_diff_angle_ = 0;
 
-public:
     Controller();  
     int iteration_count=0;
     geometry_msgs::Twist vel_msg;
