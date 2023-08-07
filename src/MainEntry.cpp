@@ -145,6 +145,42 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 	/* 获取当前读到的最新标签在数组中的下标(个数)，index */
 	left_index_mapping[i] = leftTagDataArray->size() - 1;
 	right_index_mapping[i] = rightTagDataArray->size() - 1;
+	if (i > 4){
+		int left_delta = left_index_mapping[i] - left_index_mapping[i - 1];
+		int right_delta = right_index_mapping[i] - right_index_mapping[i - 1];
+		if (left_delta == 0 && right_delta == 0)
+		{
+			cout << "Warn: No new tag detected!" << endl;
+			no_tag_cnt++;
+			if (no_tag_cnt < 100){
+				return make_tuple(0.04, 0);
+			}
+			else{
+				cout << "Warn: No new tag detected for 100 times!" << endl;
+				return make_tuple(0, 0);
+			}
+		}
+		else if (left_delta == 0){
+			if (no_tag_cnt_left < 30){
+				cout << "Warn: No new tag detected by left antenna!" << endl;
+				return make_tuple(-0.10, 0.30);
+				no_tag_cnt_left++;
+			}
+			else{
+				no_tag_cnt_left = 0;
+			}
+		}
+		else if (right_delta == 0){
+			if (no_tag_cnt_right < 30){
+				cout << "Warn: No new tag detected by right antenna!" << endl;
+				return make_tuple(-0.10, -0.30);
+				no_tag_cnt_right++;
+			}
+			else{
+				no_tag_cnt_right = 0;
+			}
+		}
+	}
 	for (int p = (i > 3 ? left_index_mapping[i - 3] : 0); p <= left_index_mapping[i]; p++)
 	{
 		assignPoseForTagData(&(leftTagDataArray->at(p)), odom);
@@ -275,7 +311,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 	// }
 	// cout<<"poseX:"<<robotPose.pose.pose.position.x<<endl;
 	cout << "location_state:" << location_state << endl;
-	if ((robot_xt[i] < sample_total_len) && (location_state == -1)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
+	if ((robot_xt[i] < sample_total_len) && (location_state == -1) && (leftTagDataArray->size()<=20 || rightTagDataArray->size()<=20)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
 	{
 		cout << "Particle Initial." << endl;
 		PF_particle.row(0) = PF_scope_x_min + (PF_scope_x_max - PF_scope_x_min) / 2 * (MatrixXd::Random(1, PF_count).array() + 1);

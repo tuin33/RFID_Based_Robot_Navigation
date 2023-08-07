@@ -97,6 +97,9 @@ public:
     int phase_flag_right = 0;
     int phase_num_count_right = 0; // 记录当前相位的读取个数，一个相位观测值对应增加1
     int phase_num_count_left = 0;  // 记录当前相位的读取个数，一个相位观测值对应增加1
+    int no_tag_cnt = 0;
+    int no_tag_cnt_left = 0;
+    int no_tag_cnt_right = 0;
     
     VectorXd phase_pre_left_antenna=VectorXd(10000);
     VectorXd phase_pre_right_antenna=VectorXd(10000);

@@ -124,10 +124,10 @@ void multiThreadListener::startRunning()
 {
     ros::CallbackQueue callback_queue_robot;
     n_robot.setCallbackQueue(&callback_queue_robot);
-    sub1 = n_robot.subscribe<nav_msgs::Odometry>("/RosAria/pose", 20, &multiThreadListener::chatterCallback1, this);
+    sub1 = n_robot.subscribe<nav_msgs::Odometry>("/odom", 20, &multiThreadListener::chatterCallback1, this);
     sub2 = n_main.subscribe("/rfid_msgs", 20, &multiThreadListener::chatterCallback2, this);
     // sub3 = n_main.subscribe("/Ending_msg", 20, &multiThreadListener::chatterCallback3, this);
-    motion_publish = n_main.advertise<geometry_msgs::Twist>("/RosAria/cmd_vel", 20);
+    motion_publish = n_main.advertise<geometry_msgs::Twist>("/cmd_vel", 20);
     std::thread spinner_thread_robot([&callback_queue_robot]()
                                      {
             ros::SingleThreadedSpinner spinner_robot;
@@ -217,11 +217,20 @@ void multiThreadListener::loopCalculate(){
     {
         if(control.iteration_count < 2000)
         {   
-            if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5)
-                continue;
-            tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
-            double linear_x = get<0>(motion);
-            double angular = get<1>(motion);
+            double linear_x, angular = 0.0;
+
+            if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5 || odom_save.robot_x.size() < 1){
+                linear_x = 0.04;
+                angular = 0.0;
+
+            }
+            else{
+                tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
+                std::cout << "test2" << std::endl;
+                linear_x = get<0>(motion);
+                angular = get<1>(motion);
+            }
+            
             // Tempolimits einhalten
             if (linear_x > LINEAR_MAX_VEL)
             {

@@ -34,10 +34,10 @@
 #define	tag_target_relative_x	5.0/100								//m
 #define tag_target_relative_y	0.0									//m
 
-#define tag_distance_threshold  40.0/100				//m
+#define tag_distance_threshold  50.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
-#define	robot_translational_vel0	10.0/100								//m/s
+#define	robot_translational_vel0	7.0/100								//m/s
 #define robot_rotational_vel0		0.0								
 
 #define true 1
