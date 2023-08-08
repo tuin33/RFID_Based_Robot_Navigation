@@ -58,10 +58,10 @@ public:
 multiThreadListener::~multiThreadListener()
 {
     ROS_INFO("Quit core Control.");
-     // Data transport
-     char fileName1[200] = {0};
+    // Data transport
+    char fileName1[200] = {0};
     std::ofstream data;
-    sprintf(fileName1, "//home//tzq//data//test//nav//RFIDdata_left.txt");
+    sprintf(fileName1, "//home//haoran//data//RFIDdata_left.txt");
     if (data.fail())
     {
         ROS_INFO("Open file 1 failed");
@@ -71,16 +71,16 @@ multiThreadListener::~multiThreadListener()
         data.open(fileName1, std::ios::out);
         ROS_INFO("file 1 is open");
         int cnt1 = 0;
-        for (int i = 0; i<leftTagDataArray.size(); i++)
+        for (int i = 0; i < leftTagDataArray.size(); i++)
         {
-            data << ++cnt1 << " " << leftTagDataArray[i].epcBuffer << " "<< leftTagDataArray[i].AntennaID << " " << leftTagDataArray[i].phase << " " << leftTagDataArray[i].timestamp << endl;
+            data << ++cnt1 << " " << leftTagDataArray[i].epcBuffer << " " << leftTagDataArray[i].AntennaID << " " << leftTagDataArray[i].phase << " " << leftTagDataArray[i].timestamp << endl;
         }
         data.close();
     }
 
     char fileName2[200] = {0};
     std::ofstream data1;
-    sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName2, "//home//haoran//data/RFIDdata_right.txt");
     if (data1.fail())
     {
         ROS_INFO("Open file 2 failed");
@@ -90,16 +90,16 @@ multiThreadListener::~multiThreadListener()
         data1.open(fileName1, std::ios::out);
         ROS_INFO("file 2 is open");
         int cnt2 = 0;
-        for (int i = 0; i<rightTagDataArray.size(); i++)
+        for (int i = 0; i < rightTagDataArray.size(); i++)
         {
-            data1 << ++cnt2 << " " << rightTagDataArray[i].epcBuffer << " "<< rightTagDataArray[i].AntennaID << " " << rightTagDataArray[i].phase << " " << rightTagDataArray[i].timestamp << endl;
+            data1 << ++cnt2 << " " << rightTagDataArray[i].epcBuffer << " " << rightTagDataArray[i].AntennaID << " " << rightTagDataArray[i].phase << " " << rightTagDataArray[i].timestamp << endl;
         }
         data1.close();
     }
 
     char fileName3[200] = {0};
     std::ofstream Odom;
-    sprintf(fileName3, "//home//tzq//data//test//nav//odom.txt");
+    sprintf(fileName3, "//home//tzq//data//odom.txt");
     if (Odom.fail())
     {
         ROS_INFO("Open file 3 failed");
@@ -108,12 +108,12 @@ multiThreadListener::~multiThreadListener()
     {
         Odom.open(fileName3, std::ios::out);
         ROS_INFO("file 3 is open");
-        //int cnt1 = 0;
+        // int cnt1 = 0;
         for (auto it1 = 0; it1 != odom_save.robot_x.size(); it1++)
         {
             Odom << std::fixed << odom_save.robot_x[it1] << " " << odom_save.robot_y[it1] << " " << odom_save.robot_th[it1] << " " << odom_save.robot_timestamp[it1] << endl;
-            //cnt1++;
-            // data1 << ++cnt1 << " " << (*it1).epc << " " << (*it1).channelIndex << " " << ((*it1).channelIndex - 1) * 0.25 + 920.625 << " " << (*it1).phase << " " << (*it1).rssi << endl;
+            // cnt1++;
+            //  data1 << ++cnt1 << " " << (*it1).epc << " " << (*it1).channelIndex << " " << ((*it1).channelIndex - 1) * 0.25 + 920.625 << " " << (*it1).phase << " " << (*it1).rssi << endl;
         }
         Odom.close();
     }
@@ -151,7 +151,6 @@ void multiThreadListener::chatterCallback1(const nav_msgs::Odometry::ConstPtr &m
     odom_save.robot_x.push_back(msg->pose.pose.position.x);
     odom_save.robot_y.push_back(msg->pose.pose.position.y);
 
-
     tf::Quaternion quat;
     tf::quaternionMsgToTF(msg->pose.pose.orientation, quat);
     double rollTemp = 0, pitchTemp = 0, yawTemp = 0;
@@ -168,28 +167,13 @@ void multiThreadListener::chatterCallback2(const RFID_Based_Robot_Navigation::rf
     // ROS_INFO("Receiving from tag: epc: %s, ant: %d", msg->epc.c_str(), msg->antID);
 
     TagData tagData;
-    // std::cout << "Antenna " << msg->antID << " :"<<"TagDataArray is recieved!" << std::endl;
-    // for (int i = 0; i < msg->phase.size(); i++)
-    // {
-    //     tagData.epcBuffer = msg->epc;
-    //     tagData.AntennaID = msg->antID;
-    //     tagData.phase = msg->phase[i];
-    //     tagData.timestamp = msg->timestamp[i];
-    //     if (msg->antID == LEFT_READER_ID)
-    //     {
-    //         leftTagDataArray.push_back(tagData);
-    //         //cout<<"leftTagDataArray.size():"<<leftTagDataArray.size()<<endl;
-    //     }
-    //     else if (msg->antID == RIGHT_READER_ID)
-    //     {
-    //         rightTagDataArray.push_back(tagData);
-    //         //cout<<"rightTagDataArray.size():"<<rightTagDataArray.size()<<endl;
-    //     }
-    // }
 
-    for (auto it1 = msg->tag_array.begin(); it1 != msg->tag_array.end(); ++it1){
-        if((*it1).epc == TARGET_TAG_EPC){
-            for(int i = 0; i < (*it1).phase.size(); ++i){
+    for (auto it1 = msg->tag_array.begin(); it1 != msg->tag_array.end(); ++it1)
+    {
+        if ((*it1).epc == TARGET_TAG_EPC)
+        {
+            for (int i = 0; i < (*it1).phase.size(); ++i)
+            {
                 tagData.epcBuffer = (*it1).epc;
                 tagData.AntennaID = (*it1).antID[i];
                 tagData.phase = (*it1).phase[i];
@@ -197,40 +181,107 @@ void multiThreadListener::chatterCallback2(const RFID_Based_Robot_Navigation::rf
                 if ((*it1).antID[i] == LEFT_READER_ID)
                 {
                     leftTagDataArray.push_back(tagData);
-                    //cout<<"leftTagDataArray.size():"<<leftTagDataArray.size()<<endl;
+                    // cout<<"leftTagDataArray.size():"<<leftTagDataArray.size()<<endl;
                 }
                 else if ((*it1).antID[i] == RIGHT_READER_ID)
                 {
                     rightTagDataArray.push_back(tagData);
-                    //cout<<"rightTagDataArray.size():"<<rightTagDataArray.size()<<endl;
+                    // cout<<"rightTagDataArray.size():"<<rightTagDataArray.size()<<endl;
                 }
             }
         }
-            
     }
-    
 }
 
-void multiThreadListener::loopCalculate(){
+void multiThreadListener::loopCalculate()
+{
     ros::Rate loop_rate(10);
     while (ros::ok())
     {
-        if(control.iteration_count < 2000)
-        {   
+        if (control.iteration_count < 2000)
+        {
             double linear_x, angular = 0.0;
+            std::cout << "start!" << std::endl;
 
-            if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5 || odom_save.robot_x.size() < 1){
+            if (leftTagDataArray.size() <= 5 || rightTagDataArray.size() <= 5 || odom_save.robot_x.size() < 1)
+            {
                 linear_x = 0.04;
                 angular = 0.0;
-
             }
-            else{
+            else
+            {
                 tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
                 std::cout << "test2" << std::endl;
                 linear_x = get<0>(motion);
                 angular = get<1>(motion);
+                char fileName5[400] = {0};
+                std::ofstream data5;
+                // sprintf(fileName4, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+                sprintf(fileName5, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//delta_gradient.txt");
+                if (data5.fail())
+                {
+                    cout << "File 5 is not open" << endl;
+                }
+                else
+                {
+                    data5.open(fileName5, std::ios::out);
+                    for (int i = 0; i < control.delta_g.size(); i++)
+                    {
+                        data5 << std::fixed << control.delta_g[i] << " " 
+                                            << control.left_g_save[i] << " " 
+                                            << control.right_g_save[i] << " "
+                                            
+                                            << std::endl;
+                    }
+                    data5.close();
+                }
+
+                char fileName6[400] = {0};
+                std::ofstream data6;
+                std::cout << "Finish writing data! 6" << std::endl;
+                sprintf(fileName6, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//left_gradient.txt");
+                if (data6.fail())
+                {
+                    cout << "File 6 is not open" << endl;
+                }
+                else
+                {
+                    data6.open(fileName6, std::ios::out);
+                    for (int i = 0; i < control.left_g_save.size(); i++)
+                    {
+                        data6 << std::fixed << control.left_g_save[i] << std::endl;
+                    }
+                    data6.close();
+                }
+
+                char fileName7[400] = {0};
+                std::ofstream data7;
+                std::cout << "Finish writing data! 7" << std::endl;
+
+                sprintf(fileName7, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//right_gradient.txt");
+                if (data7.fail())
+                {
+                    cout << "File 7 is not open" << endl;
+                }
+                else
+                {
+                    data7.open(fileName7, std::ios::out);
+                    for (int i = 0; i < control.right_g_save.size(); i++)
+                    {
+                        data7 << std::fixed << control.right_g_save[i] << std::endl;
+                    }
+                    data7.close();
+                }
+
+                std::cout << "Finish writing data! 7" << std::endl;
+
+                char fileName8[400] = {0};
+                std::ofstream data8;
+                std::cout << "Finish writing data! 8" << std::endl;
+
+                sprintf(fileName8, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//distance.txt");
             }
-            
+
             // Tempolimits einhalten
             if (linear_x > LINEAR_MAX_VEL)
             {
@@ -243,18 +294,22 @@ void multiThreadListener::loopCalculate(){
 
             if (angular > ANGULAR_MAX_VEL)
             {
+                cout << "angular: " << angular << endl;
                 angular = ANGULAR_MAX_VEL;
+                cout << "angular >>>>> ANGULAR_MAX_VEL!" << endl;
             }
             else if (angular < -ANGULAR_MAX_VEL)
             {
+                cout << "angular: " << angular << endl;
                 angular = -ANGULAR_MAX_VEL;
+                cout << "angular <<<<< ANGULAR_MAX_VEL!" << endl;
             }
 
             control.vel_msg.linear.x = linear_x;
             control.vel_msg.angular.z = angular;
             ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
-            if(linear_x==0 && angular==0)
-                break; 
+            if (linear_x == 0 && angular == 0)
+                break;
             // leftTagDataArray.clear();
             // rightTagDataArray.clear();
             control.iteration_count++;
@@ -269,10 +324,10 @@ void multiThreadListener::loopCalculate(){
         motion_publish.publish(control.vel_msg);
         loop_rate.sleep();
     }
-     char fileName1[200] = {0};
+    char fileName1[200] = {0};
     std::ofstream data1;
     // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
-    sprintf(fileName1, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//odom.txt");
+    sprintf(fileName1, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//odom.txt");
     if (data1.fail())
     {
         cout << "File 1 is not open" << endl;
@@ -287,12 +342,10 @@ void multiThreadListener::loopCalculate(){
         data1.close();
     }
 
-    std::cout << "Finish writing data! 1" << std::endl;
-
     char fileName3[200] = {0};
     std::ofstream data3;
     // sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
-    sprintf(fileName3, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_center.txt");
+    sprintf(fileName3, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_center.txt");
     if (data3.fail())
     {
         cout << "File 3 is not open" << endl;
@@ -331,7 +384,7 @@ void multiThreadListener::loopCalculate(){
     char fileName4[400] = {0};
     std::ofstream data4;
     // sprintf(fileName4, "//home//tzq//data//test//nav//RFIDdata_right.txt");
-    sprintf(fileName4, "//home//tzq//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_all.txt");
+    sprintf(fileName4, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//PF_point_all.txt");
     if (data4.fail())
     {
         cout << "File 4 is not open" << endl;
@@ -341,13 +394,70 @@ void multiThreadListener::loopCalculate(){
         data4.open(fileName4, std::ios::out);
         for (int i = 0; i < control.iteration_count; i++)
         {
-            for (int j = 0; j<1000; j++)
+            for (int j = 0; j < 1000; j++)
                 data4 << std::fixed << control.PF_point_all_x[i](0, j) << " " << control.PF_point_all_y[i](0, j) << std::endl;
         }
         data4.close();
     }
 
     std::cout << "Finish writing data! 4" << std::endl;
+
+    char fileName5[400] = {0};
+    std::ofstream data5;
+    // sprintf(fileName4, "//home//tzq//data//test//nav//RFIDdata_right.txt");
+    sprintf(fileName5, "//home//haoran//catkin_ws//src//RFID_Based_Robot_Navigation//data//delta_gradient.txt");
+    if (data5.fail())
+    {
+        cout << "File 5 is not open" << endl;
+    }
+    else
+    {
+        data5.open(fileName5, std::ios::out);
+        for (int i = 0; i < control.delta_g.size(); i++)
+        {
+            data5 << std::fixed << control.delta_g[i] << std::endl;
+        }
+        data5.close();
+    }
+
+    std::ofstream data;
+    sprintf(fileName1, "//home//haoran//data//RFIDdata_left.txt");
+    if (data.fail())
+    {
+        ROS_INFO("Open file 1 failed");
+    }
+    else
+    {
+        data.open(fileName1, std::ios::out);
+        ROS_INFO("file 1 is open");
+        int cnt1 = 0;
+        for (int i = 0; i < leftTagDataArray.size(); i++)
+        {
+            data << std::fixed << ++cnt1 << " " << leftTagDataArray[i].epcBuffer << " " << leftTagDataArray[i].AntennaID << " " << leftTagDataArray[i].phase << " " << leftTagDataArray[i].timestamp << endl;
+        }
+        data.close();
+    }
+
+    char fileName2[200] = {0};
+    // std::ofstream data1;
+    sprintf(fileName2, "//home//haoran//data//RFIDdata_right.txt");
+    if (data1.fail())
+    {
+        ROS_INFO("Open file 2 failed");
+    }
+    else
+    {
+        data1.open(fileName2, std::ios::out);
+        ROS_INFO("file 2 is open");
+        int cnt2 = 0;
+        for (int i = 0; i < rightTagDataArray.size(); i++)
+        {
+            data1 << std::fixed << ++cnt2 << " " << rightTagDataArray[i].epcBuffer << " " << rightTagDataArray[i].AntennaID << " " << rightTagDataArray[i].phase << " " << rightTagDataArray[i].timestamp << endl;
+        }
+        data1.close();
+    }
+
+    std::cout << "Finish writing data! 5" << std::endl;
 }
 
 // call back of stop flag
@@ -421,7 +531,7 @@ void multiThreadListener::loopCalculate(){
 //     robotY_recv.clear();
 //     robotW_recv.clear();
 //     robotTimeStamp_recv.clear();
-    
+
 //     double linear_x, angular;
 //     if(control.iteration_count < 500)
 //     {
@@ -462,7 +572,7 @@ void multiThreadListener::vel_publish()
     while (ros::ok())
     {
         motion_publish.publish(control.vel_msg);
-        
+
         loop_rate.sleep();
     }
 }

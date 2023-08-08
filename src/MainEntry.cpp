@@ -2,9 +2,11 @@
 
 Controller::Controller()
 {
-	l_kp_ = 0.08;
+	// l_kp_ = 0.08;
 
-	a_kp_ = 0.08;
+	a_kp_ = 0.018;
+	a_ki_ = 0.0001;
+	a_kd_ = 0;
 }
 
 /**
@@ -104,9 +106,9 @@ double Controller::pid_y_compute(double real_position, double target_position)
 	return output;
 }
 
-double Controller::pid_angle_compute(double real_angle, double target_angle)
+double Controller::pid_angle_compute(double left_g, double right_g)
 {
-	current_error_angle_ = target_angle - real_angle;
+	current_error_angle_ = left_g - right_g;
 	current_error_sum_angle_ += current_error_angle_;
 	current_error_diff_angle_ = current_error_angle_ - last_error_angle_;
 
@@ -119,6 +121,108 @@ double Controller::pid_angle_compute(double real_angle, double target_angle)
 	return output;
 }
 
+void Controller::getGradient(int i,vector<TagData> leftTagDataArray,vector<TagData> rightTagDataArray)
+{
+	double left_phase[2];
+	double right_phase[2];
+	double left_x[2],left_y[2];
+	double right_x[2],right_y[2];
+	double time;
+	int num = 20;
+
+	if (leftTagDataArray[left_index_mapping[i]].timestamp <= rightTagDataArray[right_index_mapping[i]].timestamp)
+	{
+		for (int t = right_index_mapping[i]-1; t > 0; t--)
+		{
+			if (rightTagDataArray[t].timestamp < leftTagDataArray[left_index_mapping[i]].timestamp)
+			{
+				time = leftTagDataArray[left_index_mapping[i]].timestamp;
+				right_phase[0] = (phase_pos_right_antenna[t+1] - phase_pos_right_antenna[t]) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + phase_pos_right_antenna[t];
+				left_phase[0] = phase_pos_left_antenna[left_index_mapping[i]];
+
+				right_x[0]= (rightTagDataArray[t+1].x - rightTagDataArray[t].x) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + rightTagDataArray[t].x;
+				left_x[0]= leftTagDataArray[left_index_mapping[i]].x;
+				right_y[0]= (rightTagDataArray[t+1].y - rightTagDataArray[t].y) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + rightTagDataArray[t].y;
+				left_y[0]= leftTagDataArray[left_index_mapping[i]].y;
+				break;
+			}
+		}
+
+	}
+	else
+	{
+		for (int t = left_index_mapping[i]-1; t > 0; t--)
+		{
+			if (leftTagDataArray[t].timestamp < rightTagDataArray[right_index_mapping[i]].timestamp)
+			{
+				time = rightTagDataArray[right_index_mapping[i]].timestamp;
+				left_phase[0] = (phase_pos_left_antenna[t+1] - phase_pos_left_antenna[t]) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + phase_pos_left_antenna[t];
+				right_phase[0] = phase_pos_right_antenna[right_index_mapping[i]];
+
+				left_x[0]= (leftTagDataArray[t+1].x - leftTagDataArray[t].x) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + leftTagDataArray[t].x;
+				right_x[0]= rightTagDataArray[right_index_mapping[i]].x;
+				left_y[0]= (leftTagDataArray[t+1].y - leftTagDataArray[t].y) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + leftTagDataArray[t].y;
+				right_y[0]= rightTagDataArray[right_index_mapping[i]].y;
+				break;
+			}
+		}
+	}
+
+	if (leftTagDataArray[left_index_mapping[i-num]].timestamp <= rightTagDataArray[right_index_mapping[i-num]].timestamp)
+	{
+		for (int t = right_index_mapping[i-num]-1; t > 0; t--)
+		{
+			if (rightTagDataArray[t].timestamp < leftTagDataArray[left_index_mapping[i-num]].timestamp)
+			{
+				time = leftTagDataArray[left_index_mapping[i-num]].timestamp;
+				right_phase[1] = (phase_pos_right_antenna[t+1] - phase_pos_right_antenna[t]) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + phase_pos_right_antenna[t];
+				left_phase[1] = phase_pos_left_antenna[left_index_mapping[i-num]];
+
+				right_x[1]= (rightTagDataArray[t+1].x - rightTagDataArray[t].x) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + rightTagDataArray[t].x;
+				left_x[1]= leftTagDataArray[left_index_mapping[i-num]].x;
+				right_y[1]= (rightTagDataArray[t+1].y - rightTagDataArray[t].y) / (rightTagDataArray[t+1].timestamp - rightTagDataArray[t].timestamp) * (time-rightTagDataArray[t].timestamp) + rightTagDataArray[t].y;
+				left_y[1]= leftTagDataArray[left_index_mapping[i-num]].y;
+				break;
+			}
+		}
+
+	}
+	else
+	{
+		for (int t = left_index_mapping[i-num]-1; t > 0; t--)
+		{
+			if (leftTagDataArray[t].timestamp < rightTagDataArray[right_index_mapping[i-num]].timestamp)
+			{
+				time = rightTagDataArray[right_index_mapping[i-num]].timestamp;
+				left_phase[1] = (phase_pos_left_antenna[t+1] - phase_pos_left_antenna[t]) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + phase_pos_left_antenna[t];
+				right_phase[1] = phase_pos_right_antenna[right_index_mapping[i-num]];
+
+				left_x[1]= (leftTagDataArray[t+1].x - leftTagDataArray[t].x) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + leftTagDataArray[t].x;
+				right_x[1]= rightTagDataArray[right_index_mapping[i-num]].x;
+				left_y[1]= (leftTagDataArray[t+1].y - leftTagDataArray[t].y) / (leftTagDataArray[t+1].timestamp - leftTagDataArray[t].timestamp) * (time-leftTagDataArray[t].timestamp) + leftTagDataArray[t].y;
+				right_y[1]= rightTagDataArray[right_index_mapping[i-num]].y;
+				break;
+			}
+		}
+	}
+
+	double left_distance_diff = sqrt(pow((left_x[0]- left_x[1]), 2) + pow((left_y[0] - left_y[1]), 2));
+	if(left_distance_diff==0)
+		left_g=0;
+	else
+		left_g = (left_phase[0]-left_phase[1]) / (left_distance_diff);
+
+	double right_distance_diff = sqrt(pow((right_x[0]- right_x[1]), 2) + pow((right_y[0] - right_y[1]), 2));
+	if(right_distance_diff==0)
+		right_g=0;
+	else
+		right_g = (right_phase[0]-right_phase[1]) / (right_distance_diff);
+
+	right_g_save.push_back(right_phase[0]-right_phase[1]);
+	left_g_save.push_back(left_phase[0]-left_phase[1]);
+	delta_g.push_back(right_g - left_g);
+}
+
 tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, vector<TagData> *rightTagDataArray, OdomData odom, int i)
 {
 	// vector<double> dataVector;
@@ -128,7 +232,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 	**********************************/
 	cout << "****************Info: loop " << i << " started*******************" << endl;
 
-	srand((unsigned)time(NULL)); // 设定种子数--为了在c语言中生成随机数，配合rand使用
+	// srand((unsigned)time(NULL)); // 设定种子数--为了在c语言中生成随机数，配合rand使用
 
 	/* 获取机器人的位置和姿态并进行单位换算 cm rad cm/s*/
 	int odomNum = odom.robot_x.size();
@@ -145,42 +249,42 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 	/* 获取当前读到的最新标签在数组中的下标(个数)，index */
 	left_index_mapping[i] = leftTagDataArray->size() - 1;
 	right_index_mapping[i] = rightTagDataArray->size() - 1;
-	if (i > 4){
-		int left_delta = left_index_mapping[i] - left_index_mapping[i - 1];
-		int right_delta = right_index_mapping[i] - right_index_mapping[i - 1];
-		if (left_delta == 0 && right_delta == 0)
-		{
-			cout << "Warn: No new tag detected!" << endl;
-			no_tag_cnt++;
-			if (no_tag_cnt < 100){
-				return make_tuple(0.04, 0);
-			}
-			else{
-				cout << "Warn: No new tag detected for 100 times!" << endl;
-				return make_tuple(0, 0);
-			}
-		}
-		else if (left_delta == 0){
-			if (no_tag_cnt_left < 30){
-				cout << "Warn: No new tag detected by left antenna!" << endl;
-				return make_tuple(-0.10, 0.30);
-				no_tag_cnt_left++;
-			}
-			else{
-				no_tag_cnt_left = 0;
-			}
-		}
-		else if (right_delta == 0){
-			if (no_tag_cnt_right < 30){
-				cout << "Warn: No new tag detected by right antenna!" << endl;
-				return make_tuple(-0.10, -0.30);
-				no_tag_cnt_right++;
-			}
-			else{
-				no_tag_cnt_right = 0;
-			}
-		}
-	}
+	// if (i > 4){
+	// 	int left_delta = left_index_mapping[i] - left_index_mapping[i - 1];
+	// 	int right_delta = right_index_mapping[i] - right_index_mapping[i - 1];
+	// 	if (left_delta == 0 && right_delta == 0)
+	// 	{
+	// 		cout << "Warn: No new tag detected!" << endl;
+	// 		no_tag_cnt++;
+	// 		if (no_tag_cnt < 100){
+	// 			return make_tuple(0.04, 0);
+	// 		}
+	// 		else{
+	// 			cout << "Warn: No new tag detected for 100 times!" << endl;
+	// 			return make_tuple(0, 0);
+	// 		}
+	// 	}
+	// 	else if (left_delta == 0){
+	// 		if (no_tag_cnt_left < 30){
+	// 			cout << "Warn: No new tag detected by left antenna!" << endl;
+	// 			return make_tuple(-0.10, 0.30);
+	// 			no_tag_cnt_left++;
+	// 		}
+	// 		else{
+	// 			no_tag_cnt_left = 0;
+	// 		}
+	// 	}
+	// 	else if (right_delta == 0){
+	// 		if (no_tag_cnt_right < 30){
+	// 			cout << "Warn: No new tag detected by right antenna!" << endl;
+	// 			return make_tuple(-0.10, -0.30);
+	// 			no_tag_cnt_right++;
+	// 		}
+	// 		else{
+	// 			no_tag_cnt_right = 0;
+	// 		}
+	// 	}
+	// }
 	for (int p = (i > 3 ? left_index_mapping[i - 3] : 0); p <= left_index_mapping[i]; p++)
 	{
 		assignPoseForTagData(&(leftTagDataArray->at(p)), odom);
@@ -301,17 +405,17 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 	}
 	cout << "左天线相位当前数量: " << phase_num_count_left << endl;
 	cout << "右天线相位当前数量: " << phase_num_count_right << endl;
-	// for(int i=0;i<phase_num_count_left;i++)
-	// {
-	// 	cout<<"左天线相位: "<<phase_pos_left_antenna(i)<<endl;
-	// }
-	// for(int i=0;i<phase_num_count_right;i++)
-	// {
-	// 	cout<<"右天线相位: "<<phase_pos_right_antenna(i)<<endl;
-	// }
+	for (int i = 0; i < phase_num_count_left; i++)
+	{
+		cout << "左天线相位: " << phase_pos_left_antenna(i) << endl;
+	}
+	for (int i = 0; i < phase_num_count_right; i++)
+	{
+		cout << "右天线相位: " << phase_pos_right_antenna(i) << endl;
+	}
 	// cout<<"poseX:"<<robotPose.pose.pose.position.x<<endl;
 	cout << "location_state:" << location_state << endl;
-	if ((robot_xt[i] < sample_total_len) && (location_state == -1) && (leftTagDataArray->size()<=20 || rightTagDataArray->size()<=20)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
+	if ((robot_xt[i] < sample_total_len) && (location_state == -1) && (leftTagDataArray->size() <= 20 || rightTagDataArray->size() <= 20)) // 机器人的运动距离未达到定位的标准，且处于数据累计阶段
 	{
 		cout << "Particle Initial." << endl;
 		PF_particle.row(0) = PF_scope_x_min + (PF_scope_x_max - PF_scope_x_min) / 2 * (MatrixXd::Random(1, PF_count).array() + 1);
@@ -408,9 +512,6 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		PF_particle.row(2) = ((PF_distance_left_antenna_last.array() / wave_length_var[0]) - (PF_distance_left_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
 		PF_particle.row(5) = ((PF_distance_right_antenna_last.array() / wave_length_var[0]) - (PF_distance_right_antenna_last.array() / wave_length_var[0]).floor()).array() * 2 * PI;
 
-		// PF_particle.row(2) = (PF_distance_left_antenna_last.array() / wave_length_var[0]).array() * 2 * PI;
-		// PF_particle.row(5) = (PF_distance_right_antenna_last.array() / wave_length_var[0]).array() * 2 * PI;
-
 		// cout << "-------------------------------------------------------------------------------------" << endl;
 		// cout << "预测上一时刻左天线解缠相位为 " << PF_distance_left_antenna_last.array().sum() / wave_length_var[0] / PF_count * 2 * PI << endl;
 		// cout << "PF_particle.row(2): " << PF_particle.row(2).sum() / PF_count << endl;
@@ -420,9 +521,6 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		///*左右天线当前时刻相位*/
 		PF_distance_left_antenna_now = ((leftTagDataArray->at(leftEnd).x - PF_particle.row(0).array()).array().pow(2) + (leftTagDataArray->at(leftEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
 		PF_distance_right_antenna_now = ((rightTagDataArray->at(rightEnd).x - PF_particle.row(0).array()).array().pow(2) + (rightTagDataArray->at(rightEnd).y - PF_particle.row(1).array()).array().pow(2)).cwiseSqrt().array() * 2;
-
-		// PF_particle.row(3) = (PF_distance_left_antenna_now.array() / wave_length_var[0]) * 2 * PI;
-		// PF_particle.row(6) = (PF_distance_right_antenna_now.array() / wave_length_var[0]) * 2 * PI;
 
 		PF_particle.row(3) = ((PF_distance_left_antenna_now.array() / wave_length_var[0]) - (PF_distance_left_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
 		PF_particle.row(6) = ((PF_distance_right_antenna_now.array() / wave_length_var[0]) - (PF_distance_right_antenna_now.array() / wave_length_var[0]).floor()) * 2 * PI;
@@ -469,7 +567,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 		// std::default_random_engine generator;
 		// std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-		//int index = static_cast<int>(distribution(generator) * (PF_count - 1)); // 生成0 - （PF_count-1） 的随机数
+		// int index = static_cast<int>(distribution(generator) * (PF_count - 1)); // 生成0 - （PF_count-1） 的随机数
 		int index = (((double)rand()) / RAND_MAX) * (PF_count - 1) + 0; // 生成0 - （PF_count-1） 的随机数
 		double beta = 0;
 		double mw = PF_w.row(2).maxCoeff();
@@ -484,29 +582,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 			}
 			PF_particle_new.col(j) = PF_particle.col(index);
 		}
-		// PF_particle_new = PF_particle;
-		// double Neff = 1 / (PF_w.row(2).array().pow(2).sum());
-		// cout << "Neff: " << PF_w.row(2).array().pow(2).sum() << endl;
-		// cout << "PF_w" << PF_w.row(0) << endl;
-		// cout << "PF_w" << PF_w.row(1) << endl;
-		// if (Neff < 75)
-		// {
-		// 	for (int j = 0; j < PF_count; j++)
-		// 	{
-		// 		srand(time(0));
-		// 		double r = rand() % 100 / (double)101;
-		// 		double beta = 0;
-		// 		for (int k = 0; k < PF_count; k++)
-		// 		{
-		// 			beta = beta + PF_w(2, k);
-		// 			if (beta >= r)
-		// 			{
-		// 				PF_particle_new.col(j) = PF_particle.col(k);
-		// 				break;
-		// 			}
-		// 		}
-		// 	}
-		// }
+
 		PF_particle = PF_particle_new;
 
 		// cout << "5" << endl;
@@ -559,28 +635,100 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 				// 判定是否达到目标
 				// if (abs(tag_estimation_relative_x(i) - tag_target_relative_x) > 10 || (abs(tag_target_relative_y - tag_estimation_relative_y(i)) > 10))
 				// if (((tag_distance(i) > tag_distance_threshold)) && (tag_estimation_relative_x(i) > tag_target_relative_x))
-				if (((tag_distance(i) > tag_distance_threshold)) || abs(tag_beta(i)) > 5 * PI / 180)
+				if (((tag_distance(i) > 0)) || abs(tag_beta(i)) > 5 * PI / 180)
 				{
 					cout << "Controlling ..." << endl;
-					// robot_vx(i)= pid_x_compute(robot_xt[i], PF_center_mean(0, i) );
-					// //robot_vy(i)  = pid_y_compute(robot_yt[i],PF_center_mean(1, i) );
-					// robot_w(i)  = pid_angle_compute(robot_tht[i], tag_beta(i));
+					double left_phase_diff, right_phase_diff;
+					double left_distance_diff, right_distance_diff;
+					double left_g, right_g;
+					double left_phase_last=0, right_phase_last=0;
+					double left_phase_now=0, right_phase_now=0;
+					if (left_index_mapping[i] == left_index_mapping[i - 10])
+					{
+						//robot_w(i) += 0.12;
+						left_g = 0;
+					}
+					else
+					{	
+						for(int i=left_index_mapping[i - 5];i<=left_index_mapping[i];i++)
+						{
+							left_phase_last += phase_pos_left_antenna(i);
+						}
+						left_phase_last = left_phase_last/(left_index_mapping[i]-left_index_mapping[i - 10]+1);
+						for(int i=left_index_mapping[i - 30];i<=left_index_mapping[i-25];i++)
+						{
+							left_phase_now += phase_pos_left_antenna(i);
+						}
+						left_phase_now = left_phase_now/(left_index_mapping[i-10]-left_index_mapping[i - 20]+1);
+						left_phase_diff = left_phase_now - left_phase_last;
+						left_distance_diff = sqrt(pow((leftTagDataArray->at(left_index_mapping[i]).y - leftTagDataArray->at(left_index_mapping[i - 10]).y), 2) + pow((leftTagDataArray->at(left_index_mapping[i]).x - leftTagDataArray->at(left_index_mapping[i - 10]).x), 2));
+						left_g = left_phase_diff / left_distance_diff;
+					}
+
+					if (right_index_mapping[i] == right_index_mapping[i - 10] && i>10)
+					{
+						//robot_w(i) += -0.12;
+						right_g=0;
+					}
+					else
+					{
+						for(int i=right_index_mapping[i - 5];i<=right_index_mapping[i];i++)
+						{
+							right_phase_last += phase_pos_right_antenna(i);
+						}
+						right_phase_last = right_phase_last/(right_index_mapping[i]-right_index_mapping[i - 10]+1);
+						for(int i=right_index_mapping[i - 30];i<=right_index_mapping[i-25];i++)
+						{
+							right_phase_now += phase_pos_right_antenna(i);
+						}
+						right_phase_now = right_phase_now/(right_index_mapping[i-10]-right_index_mapping[i - 20]+1);
+						right_phase_diff = right_phase_now - right_phase_last;
+						//right_phase_diff = phase_pos_right_antenna(right_index_mapping[i]) - phase_pos_right_antenna(right_index_mapping[i - 10]);
+						right_distance_diff = sqrt(pow((rightTagDataArray->at(right_index_mapping[i]).y - rightTagDataArray->at(right_index_mapping[i - 10]).y), 2) + pow((rightTagDataArray->at(right_index_mapping[i]).x - rightTagDataArray->at(right_index_mapping[i - 10]).x), 2));
+						right_g = right_phase_diff / right_distance_diff;
+					}
+
+					// getGradient(i,*leftTagDataArray,*rightTagDataArray);
+
+					// double left_phase_diff = phase_pos_left_antenna(leftEnd) - phase_pos_left_antenna(leftStart);
+					// double left_distance_diff = sqrt(pow((leftTagDataArray->at(leftEnd).y - leftTagDataArray->at(leftStart).y), 2) + pow((leftTagDataArray->at(leftEnd).x - leftTagDataArray->at(leftStart).x), 2));
+					// left_g = left_phase_diff / left_distance_diff;
+
+					// double right_phase_diff = phase_pos_right_antenna(rightEnd) - phase_pos_right_antenna(rightStart);
+					// double right_distance_diff = sqrt(pow((rightTagDataArray->at(rightEnd).y - rightTagDataArray->at(rightStart).y), 2) + pow((rightTagDataArray->at(rightEnd).x - rightTagDataArray->at(rightStart).x), 2));
+					// right_g = right_phase_diff / right_distance_diff;
+
+					cout << "left_g = " << left_g << endl;
+					cout << "right_g = " << right_g << endl;
+					cout << "delta_g = " << right_g - left_g << endl;
+					// left_g_save.push_back(left_g);
+					// right_g_save.push_back(right_g);
+					// delta_g.push_back(right_g - left_g);
+					left_g_save.push_back(left_phase_diff);
+					right_g_save.push_back(right_phase_diff);
+					delta_g.push_back(right_phase_diff - left_phase_diff);
+
+					//robot_w(i) = pid_angle_compute(right_g, left_g);
+					robot_w(i)=0;
+					//  robot_vx(i)= pid_x_compute(robot_xt[i], PF_center_mean(0, i) );
+					//  //robot_vy(i)  = pid_y_compute(robot_yt[i],PF_center_mean(1, i) );
+					//  robot_w(i)  = pid_angle_compute(robot_tht[i], tag_beta(i));
 					robot_vx(i) = 0.12;
 					// robot_vy(i) = 0;
-					robot_w(i) = 0;
-					if (tag_beta(i) < -tag_beta_threshold)
-					{
-						robot_w(i) = -0.12;
-					}
-					if (tag_beta(i) > tag_beta_threshold)
-					{
-						robot_w(i) = 0.12;
-					}
+					// robot_w(i) = 0;
+					// if (tag_beta(i) < -tag_beta_threshold)
+					// {
+					// 	robot_w(i) = -0.12;
+					// }
+					// if (tag_beta(i) > tag_beta_threshold)
+					// {
+					// 	robot_w(i) = 0.12;
+					// }
 				}
-				// else if (sqrt(pow(robot_xt[i], 2) + pow(robot_yt[i], 2)) <= 1)
-				// {
-				// 	robot_vx(i) = 0.1;
-				// }
+				else if (sqrt(pow(robot_xt[i], 2) + pow(robot_yt[i], 2)) <= 1)
+				{
+					robot_vx(i) = 0.12;
+				}
 				else
 				{
 					cout << "伺服控制成功 " << endl;
@@ -593,7 +741,7 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 			{
 				cout << "Location unstable." << endl;
 				location_state = 0;
-				robot_vx(i) = robot_translational_vel0 ;
+				robot_vx(i) = robot_translational_vel0;
 				// if (robot_vx(i) > 0.08)
 				// 	robot_vx(i) = 0.08;
 				// robot_vy(i) = 0;

@@ -37,7 +37,7 @@
 #define tag_distance_threshold  50.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
-#define	robot_translational_vel0	7.0/100								//m/s
+#define	robot_translational_vel0	12.0/100								//m/s
 #define robot_rotational_vel0		0.0								
 
 #define true 1
@@ -51,7 +51,7 @@
 #define PF_Q			0.03			//过程噪声，标准差，单位m
 #define PF_R			pow(0.1,2)	//测量噪声，方差，单位rad
 
-#define LINEAR_MAX_VEL 0.5  //速度最大值
-#define ANGULAR_MAX_VEL 0.3
+#define LINEAR_MAX_VEL 0.15  //速度最大值
+#define ANGULAR_MAX_VEL 0.5
 
 #endif

@@ -164,13 +164,23 @@ public:
     double last_error_y_, last_error_sum_y_, last_error_diff_y_ = 0;
     double last_error_angle_, last_error_sum_angle_, last_error_diff_angle_ = 0;
 
+    double left_g,right_g;
+    int flag_g=0;
+    vector<double> delta_g;
+    vector<double> left_g_save;
+    vector<double> right_g_save;
+
     Controller();  
     int iteration_count=0;
     geometry_msgs::Twist vel_msg;
+
+
     // PID控制
     double pid_x_compute(double real_position, double target_position);
     double pid_y_compute(double real_position, double target_position);
-    double pid_angle_compute(double real_angle, double target_angle);
+    double pid_angle_compute(double left_g, double right_g);
+
+    void getGradient(int i,vector<TagData> leftTagDataArray, vector<TagData> rightTagDataArray);
 
     // 粒子滤波
     tuple<double, double> getMotion(vector<TagData>* leftTagDataArray, vector<TagData>* rightTagDataArray, OdomData odom, int i);
