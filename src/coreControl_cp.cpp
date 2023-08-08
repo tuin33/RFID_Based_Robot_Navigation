@@ -124,10 +124,10 @@ void multiThreadListener::startRunning()
 {
     ros::CallbackQueue callback_queue_robot;
     n_robot.setCallbackQueue(&callback_queue_robot);
-    sub1 = n_robot.subscribe<nav_msgs::Odometry>("/RosAria/pose", 20, &multiThreadListener::chatterCallback1, this);
+    sub1 = n_robot.subscribe<nav_msgs::Odometry>("/odom", 20, &multiThreadListener::chatterCallback1, this);
     sub2 = n_main.subscribe("/rfid_msgs", 20, &multiThreadListener::chatterCallback2, this);
     // sub3 = n_main.subscribe("/Ending_msg", 20, &multiThreadListener::chatterCallback3, this);
-    motion_publish = n_main.advertise<geometry_msgs::Twist>("/RosAria/cmd_vel", 20);
+    motion_publish = n_main.advertise<geometry_msgs::Twist>("/cmd_vel", 20);
     std::thread spinner_thread_robot([&callback_queue_robot]()
                                      {
             ros::SingleThreadedSpinner spinner_robot;
