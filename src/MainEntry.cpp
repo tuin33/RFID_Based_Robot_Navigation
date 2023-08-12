@@ -506,20 +506,20 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 					// robot_vx(i)= pid_x_compute(robot_xt[i], PF_center_mean(0, i) );
 					// //robot_vy(i)  = pid_y_compute(robot_yt[i],PF_center_mean(1, i) );
 					// robot_w(i)  = pid_angle_compute(robot_tht[i], tag_beta(i));
-					robot_vx(i) = 0.07;
+					robot_vx(i) = 0.15;
 					// robot_vy(i) = 0;
 					robot_w(i) = 0;
 					if (tag_beta(i) < -tag_beta_threshold)
 					{
-						robot_w(i) = -0.1;
+						robot_w(i) = -0.2;
 					}
 					if (tag_beta(i) > tag_beta_threshold)
 					{
-						robot_w(i) = 0.1;
+						robot_w(i) = 0.2;
 					}
 				}
 				else if (sqrt(pow(robot_xt[i],2)+pow(robot_yt[i],2))<=1){
-					robot_vx(i) = 0.04;
+					robot_vx(i) = 0.07;
 				}
 				else
 				{
@@ -527,6 +527,23 @@ tuple<double, double> Controller::getMotion(vector<TagData> *leftTagDataArray, v
 					robot_vx(i) = 0;
 					// robot_vy(i) = 0;
 					robot_w(i) = 0;
+
+					sf::SoundBuffer buffer;
+					if (buffer.loadFromFile("/home/haoran/audio/amazing.wav")) {
+						std::cout << "load success" << std::endl;
+						// 创建音频源
+						sf::Sound sound;
+						sound.setBuffer(buffer);
+
+						// 播放音频
+						sound.play();
+
+						// 等待音频播放完毕
+						while (sound.getStatus() == sf::Sound::Playing) {}
+					}
+					else{
+						std::cout << "load failed" << std::endl;
+					}
 				}
 			}
 			else

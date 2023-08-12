@@ -1539,7 +1539,7 @@ int CMyApplication::setImpinjReaderConfig()
 	CRFTransmitter *pRftx = new CRFTransmitter();
 	pRftx->setChannelIndex(m_channelIndex);
 	// pRftx->setHopTableID(1);
-	pRftx->setTransmitPower(65);
+	pRftx->setTransmitPower(75);
 
 	pAnt->setRFTransmitter(pRftx);
 

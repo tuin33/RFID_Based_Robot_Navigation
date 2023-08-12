@@ -28,16 +28,16 @@
 #define antenna_right_y			    21.25/100
 
 #define	control_period			0.1									//控制周期，单位秒 
-#define	sample_total_len		20.0/100									//初始的采样长度，m
+#define	sample_total_len		30.0/100									//初始的采样长度，m
 #define phase_grade_len			6.0/100									//相位梯度对应的物理距离，m
 
 #define	tag_target_relative_x	5.0/100								//m
 #define tag_target_relative_y	0.0									//m
 
-#define tag_distance_threshold  30.0/100				//m
+#define tag_distance_threshold  40.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
-#define	robot_translational_vel0	2.0/100								//m/s
+#define	robot_translational_vel0	4.0/100								//m/s
 #define robot_rotational_vel0		0.0								
 
 #define true 1

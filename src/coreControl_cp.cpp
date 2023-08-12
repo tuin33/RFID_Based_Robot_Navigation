@@ -14,6 +14,8 @@
 #include "tf/transform_datatypes.h"
 #include <ros/console.h>
 #include "MainEntry.h"
+#include "std_msgs/Int32.h"
+
 
 class multiThreadListener
 {
@@ -24,7 +26,9 @@ private:
     ros::Subscriber sub1;
     ros::Subscriber sub2;
     ros::Subscriber sub3;
+    ros::Subscriber signal_sub;
     ros::Publisher motion_publish;
+    ros::Publisher signal_pub;
 
 public:
     OdomData odom;
@@ -50,7 +54,9 @@ public:
     void chatterCallback2(const RFID_Based_Robot_Navigation::rfid_msgs::ConstPtr &msg);
     void chatterCallback3(const RFID_Based_Robot_Navigation::sendEnding::ConstPtr &msg);
 
-    void loopCalculate();
+    void loopCalculate1();
+    void loopCalculate(const std_msgs::Int32::ConstPtr &msg);
+
 
     void vel_publish();
 };
@@ -128,12 +134,14 @@ void multiThreadListener::startRunning()
     sub2 = n_main.subscribe("/rfid_msgs", 20, &multiThreadListener::chatterCallback2, this);
     // sub3 = n_main.subscribe("/Ending_msg", 20, &multiThreadListener::chatterCallback3, this);
     motion_publish = n_main.advertise<geometry_msgs::Twist>("/cmd_vel", 20);
+//    signal_sub = n_main.subscribe("/audio_info", 20, &multiThreadListener::loopCalculate, this);
+    signal_pub = n_main.advertise<std_msgs::Int32>("/reach_signal", 20);
     std::thread spinner_thread_robot([&callback_queue_robot]()
                                      {
             ros::SingleThreadedSpinner spinner_robot;
             spinner_robot.spin(&callback_queue_robot); });
     std::thread vel_pub(&multiThreadListener::vel_publish, this);
-    std::thread loop_calculate(&multiThreadListener::loopCalculate, this);
+    std::thread loop_calculate(&multiThreadListener::loopCalculate1, this);
     ros::spin();
     spinner_thread_robot.join();
 }
@@ -168,24 +176,7 @@ void multiThreadListener::chatterCallback2(const RFID_Based_Robot_Navigation::rf
     // ROS_INFO("Receiving from tag: epc: %s, ant: %d", msg->epc.c_str(), msg->antID);
 
     TagData tagData;
-    // std::cout << "Antenna " << msg->antID << " :"<<"TagDataArray is recieved!" << std::endl;
-    // for (int i = 0; i < msg->phase.size(); i++)
-    // {
-    //     tagData.epcBuffer = msg->epc;
-    //     tagData.AntennaID = msg->antID;
-    //     tagData.phase = msg->phase[i];
-    //     tagData.timestamp = msg->timestamp[i];
-    //     if (msg->antID == LEFT_READER_ID)
-    //     {
-    //         leftTagDataArray.push_back(tagData);
-    //         //cout<<"leftTagDataArray.size():"<<leftTagDataArray.size()<<endl;
-    //     }
-    //     else if (msg->antID == RIGHT_READER_ID)
-    //     {
-    //         rightTagDataArray.push_back(tagData);
-    //         //cout<<"rightTagDataArray.size():"<<rightTagDataArray.size()<<endl;
-    //     }
-    // }
+
 
     for (auto it1 = msg->tag_array.begin(); it1 != msg->tag_array.end(); ++it1){
         if((*it1).epc == TARGET_TAG_EPC){
@@ -211,163 +202,79 @@ void multiThreadListener::chatterCallback2(const RFID_Based_Robot_Navigation::rf
     
 }
 
-void multiThreadListener::loopCalculate(){
-    ros::Rate loop_rate(10);
-    while (ros::ok())
-    {
-        if(control.iteration_count < 2000)
-        {   
-            if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5)
-                continue;
-            tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
-            double linear_x = get<0>(motion);
-            double angular = get<1>(motion);
-            // Tempolimits einhalten
-            if (linear_x > LINEAR_MAX_VEL)
-            {
-                linear_x = LINEAR_MAX_VEL;
-            }
-            else if (linear_x < -LINEAR_MAX_VEL)
-            {
-                linear_x = -LINEAR_MAX_VEL;
-            }
-
-            if (angular > ANGULAR_MAX_VEL)
-            {
-                angular = ANGULAR_MAX_VEL;
-            }
-            else if (angular < -ANGULAR_MAX_VEL)
-            {
-                angular = -ANGULAR_MAX_VEL;
-            }
-
-            control.vel_msg.linear.x = linear_x;
-            control.vel_msg.angular.z = angular;
-            ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
-            if(linear_x==0 && angular==0)
-                break; 
-            // leftTagDataArray.clear();
-            // rightTagDataArray.clear();
-            control.iteration_count++;
-        }
-        else
-        {
-            control.vel_msg.linear.x = 0.0;
-            control.vel_msg.angular.z = 0.0;
-            ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
-            break;
-        }
-        motion_publish.publish(control.vel_msg);
-        loop_rate.sleep();
-
-    }
-}
-
-// call back of stop flag
-// void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::sendEnding::ConstPtr &msg)
-// {
-//     ROS_INFO("Received ending info.");
-//     char fileName1[200] = {0};
-//     std::ofstream data;
-//     sprintf(fileName1, "//home//tzq//data//test//nav//RFIDdata_left.txt");
-//     if (data.fail())
-//     {
-//         ROS_INFO("Open file 1 failed");
-//     }
-//     else
-//     {
-//         data.open(fileName1, std::ios::out);
-//         ROS_INFO("file 1 is open");
-//         int cnt1 = 0;
-//         for (int i = 0; i<leftTagDataArray.size(); i++)
-//         {
-//             data << std::fixed<< ++cnt1 << " " << leftTagDataArray[i].epcBuffer << " "<< leftTagDataArray[i].AntennaID << " " << leftTagDataArray[i].phase << " " << leftTagDataArray[i].timestamp << endl;
-//         }
-//         data.close();
-//     }
-
-//     char fileName2[200] = {0};
-//     std::ofstream data1;
-//     sprintf(fileName2, "//home//tzq//data//test//nav//RFIDdata_right.txt");
-//     if (data1.fail())
-//     {
-//         ROS_INFO("Open file 2 failed");
-//     }
-//     else
-//     {
-//         data1.open(fileName2, std::ios::out);
-//         ROS_INFO("file 2 is open");
-//         int cnt2 = 0;
-//         for (int i = 0; i<rightTagDataArray.size(); i++)
-//         {
-//             data1 << std::fixed<< ++cnt2 << " " << rightTagDataArray[i].epcBuffer << " "<< rightTagDataArray[i].AntennaID << " " << rightTagDataArray[i].phase << " " << rightTagDataArray[i].timestamp << endl;
-//         }
-//         data1.close();
-//     }
-
-//     char fileName3[200] = {0};
-//     std::ofstream Odom;
-//     sprintf(fileName3, "//home//tzq//data//test//nav//odom.txt");
-//     if (Odom.fail())
-//     {
-//         ROS_INFO("Open file 3 failed");
-//     }
-//     else
-//     {
-//         Odom.open(fileName3, std::ios::out);
-//         ROS_INFO("file 3 is open");
-//         //int cnt1 = 0;
-//         for (auto it1 = 0; it1 != odom_save.robot_x.size(); it1++)
-//         {
-//             Odom << std::fixed << odom_save.robot_x[it1] << " " << odom_save.robot_y[it1] << " " << odom_save.robot_th[it1] << " " << odom_save.robot_timestamp[it1] << endl;
-//             //cnt1++;
-//             // data1 << ++cnt1 << " " << (*it1).epc << " " << (*it1).channelIndex << " " << ((*it1).channelIndex - 1) * 0.25 + 920.625 << " " << (*it1).phase << " " << (*it1).rssi << endl;
-//         }
-//         Odom.close();
-//     }
-//     odom.robot_timestamp.swap(robotTimeStamp_recv);
-//     odom.robot_x.swap(robotX_recv);
-//     odom.robot_y.swap(robotY_recv);
-//     odom.robot_th.swap(robotW_recv);
-
-//     robotX_recv.clear();
-//     robotY_recv.clear();
-//     robotW_recv.clear();
-//     robotTimeStamp_recv.clear();
-    
-//     double linear_x, angular;
-//     if(control.iteration_count < 500)
-//     {
-//         tuple<double, double> motion = control.getMotion(leftTagDataArray, rightTagDataArray, odom, control.iteration_count);
-//         linear_x = get<0>(motion);
-//         angular = get<1>(motion);
-//         // Tempolimits einhalten
-//         if (linear_x > LINEAR_MAX_VEL)
-//         {
-//             linear_x = LINEAR_MAX_VEL;
-//         }
-//         else if (linear_x < -LINEAR_MAX_VEL)
-//         {
-//             linear_x = -LINEAR_MAX_VEL;
-//         }
-
-//         if (angular > ANGULAR_MAX_VEL)
-//         {
-//             angular = ANGULAR_MAX_VEL;
-//         }
-//         else if (angular < -ANGULAR_MAX_VEL)
-//         {
-//             angular = -ANGULAR_MAX_VEL;
-//         }
-
-//         control.vel_msg.linear.x = linear_x;
-//         control.vel_msg.angular.z = angular;
-//         ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
-//         // leftTagDataArray.clear();
-//         // rightTagDataArray.clear();
-//         control.iteration_count++;
+// void multiThreadListener::loopCalculate(const std_msgs::Int32::ConstPtr &msg){
+//     if (msg->data == 5){
+//         leftTagDataArray.clear();
+//         rightTagDataArray.clear();
+//         std::thread loop_calculate(&multiThreadListener::loopCalculate1, this);
+//         loop_calculate.join();
 //     }
 // }
+
+void multiThreadListener::loopCalculate1(){
+// void multiThreadListener::loopCalculate(const std_msgs::Int32::ConstPtr &msg){
+    // bool execute = false;
+    // if (msg->data == 5){
+    //     execute = true;
+    // }
+    // if (execute){
+
+        ros::Rate loop_rate(10);
+        while (ros::ok())
+        {
+            if(control.iteration_count < 2000)
+            {   
+                double linear_x, angular = 0.0;
+                if(leftTagDataArray.size()<=5 || rightTagDataArray.size()<=5){
+                    linear_x = 0.04;
+                }
+                else{
+                    tuple<double, double> motion = control.getMotion(&leftTagDataArray, &rightTagDataArray, odom_save, control.iteration_count);
+                    linear_x = get<0>(motion);
+                    angular = get<1>(motion);
+                }
+                // Tempolimits einhalten
+                if (linear_x > LINEAR_MAX_VEL)
+                {
+                    linear_x = LINEAR_MAX_VEL;
+                }
+                else if (linear_x < -LINEAR_MAX_VEL)
+                {
+                    linear_x = -LINEAR_MAX_VEL;
+                }
+
+                if (angular > ANGULAR_MAX_VEL)
+                {
+                    angular = ANGULAR_MAX_VEL;
+                }
+                else if (angular < -ANGULAR_MAX_VEL)
+                {
+                    angular = -ANGULAR_MAX_VEL;
+                }
+
+                control.vel_msg.linear.x = linear_x;
+                control.vel_msg.angular.z = angular;
+                ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
+                if(linear_x==0 && angular==0)
+                    break; 
+                // leftTagDataArray.clear();
+                // rightTagDataArray.clear();
+                control.iteration_count++;
+            }
+            else
+            {
+                
+                control.vel_msg.linear.x = 0.0;
+                control.vel_msg.angular.z = 0.0;
+                ROS_INFO("[%0.2f m/s, %0.2f rad/s]", control.vel_msg.linear.x, control.vel_msg.angular.z);
+                break;
+            }
+            motion_publish.publish(control.vel_msg);
+            loop_rate.sleep();
+
+        }
+//    }
+}
 
 void multiThreadListener::vel_publish()
 {

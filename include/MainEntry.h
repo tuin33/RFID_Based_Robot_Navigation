@@ -16,6 +16,7 @@
 #include "TagData.h"
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include <SFML/Audio.hpp>
 
 #define EIGEN_USE_MKL_ALL
 #define EIGEN_VECTORIZE_SSE4_2

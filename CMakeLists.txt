@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+find_package(SFML 2.5 REQUIRED COMPONENTS audio)
+
 find_library(LIBLTKCPP libltkcpp_x86_64.a ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 find_library(LIBLTKCPP_IMPINJ libltkcppimpinj_x86_64.a ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 # it is not recommended to statically link for ssl and crypto libraries
@@ -181,11 +183,11 @@ add_executable(reader_node_nav src/reader_node_nav.cpp src/RFIDHandler_nav.cpp)
 target_link_libraries(reader_node_nav ${LIBS} ${catkin_LIBRARIES})
 add_executable(RFIDreceiver src/RFIDreceiver.cpp)
 target_link_libraries(RFIDreceiver ${LIBS} ${catkin_LIBRARIES})
-add_executable(coreControl src/coreControl.cpp src/MainEntry.cpp)
-target_link_libraries(coreControl ${LIBS} ${catkin_LIBRARIES})
+# add_executable(coreControl src/coreControl.cpp src/MainEntry.cpp)
+# target_link_libraries(coreControl ${LIBS} ${catkin_LIBRARIES})
 
 add_executable(coreControl_cp src/coreControl_cp.cpp src/MainEntry.cpp)
-target_link_libraries(coreControl_cp ${LIBS} ${catkin_LIBRARIES})
+target_link_libraries(coreControl_cp ${LIBS} ${catkin_LIBRARIES} sfml-audio)
 
 add_executable(rfid_node_start src/RFIDHandler.cpp src/HandlerStart.cpp)
 target_link_libraries(rfid_node_start ${LIBS} ${catkin_LIBRARIES})
@@ -197,6 +199,9 @@ target_link_libraries(keyboard_node_aria ${LIBS} ${catkin_LIBRARIES})
 
 add_executable(set_permissions_node src/set_permissions_node.cpp)
 target_link_libraries(set_permissions_node ${LIBS} ${catkin_LIBRARIES})
+
+add_executable(voiceControl src/voiceControl.cpp)
+target_link_libraries(voiceControl ${LIBS} ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
