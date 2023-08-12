@@ -7,7 +7,7 @@
 #ifndef _STATIC_PROPERTIES_H_
 #define _STATIC_PROPERTIES_H_
 
-#define	RFID_READER_IP_ADDRESS	"192.168.0.105"					//RFID读写器的IP地址
+#define	RFID_READER_IP_ADDRESS	"115.156.142.223"					//192.168.0.105RFID读写器的IP地址
 
 #define	LEFT_READER_ID			1									//左读写器ID
 #define	RIGHT_READER_ID			2									//右读写器ID
@@ -17,27 +17,38 @@
 #define ARRAY_SIZE				1000000								//保存数组的大小
 
 #define PI						3.1415926
-#define	antenna_H_left				21.274/100//27.08//24.1
-#define	antenna_alpha_left			1.524 //(1.5707963+0.0739)//67.2/180*PI
-#define	antenna_H_right				21.274/100//29.07//25.2
-#define	antenna_alpha_right			1.524 //(1.5707963+0.0689)//67.0/180*PI
+#define	antenna_H_left				25.0/100//27.08//24.1
+#define	antenna_alpha_left			0 //(1.5707963+0.0739)//67.2/180*PI
+#define	antenna_H_right				25.0/100//29.07//25.2
+#define	antenna_alpha_right			0 //(1.5707963+0.0689)//67.0/180*PI
 
-#define antenna_left_x				1.0/100
-#define antenna_left_y			    -21.25/100
+#define antenna_left_x				0.0/100
+#define antenna_left_y			    -25.0/100
 #define antenna_right_x				1.0/100
-#define antenna_right_y			    21.25/100
+#define antenna_right_y			    0.0/100
 
 #define	control_period			0.1									//控制周期，单位秒 
+<<<<<<< HEAD
 #define	sample_total_len		30.0/100									//初始的采样长度，m
+=======
+#define	sample_total_len		15.0/100									//初始的采样长度，m
+>>>>>>> d499c9fb5a606118461fdade778a94d26e6e3252
 #define phase_grade_len			6.0/100									//相位梯度对应的物理距离，m
 
 #define	tag_target_relative_x	5.0/100								//m
 #define tag_target_relative_y	0.0									//m
 
+<<<<<<< HEAD
 #define tag_distance_threshold  40.0/100				//m
 #define tag_beta_threshold	10.0 / 180.0 * PI		//rad
 
 #define	robot_translational_vel0	4.0/100								//m/s
+=======
+#define tag_distance_threshold  50.0/100				//m
+#define tag_beta_threshold	10.0 / 180.0 * PI		//rad
+
+#define	robot_translational_vel0	12.0/100								//m/s
+>>>>>>> d499c9fb5a606118461fdade778a94d26e6e3252
 #define robot_rotational_vel0		0.0								
 
 #define true 1
@@ -51,7 +62,7 @@
 #define PF_Q			0.03			//过程噪声，标准差，单位m
 #define PF_R			pow(0.1,2)	//测量噪声，方差，单位rad
 
-#define LINEAR_MAX_VEL 0.5  //速度最大值
-#define ANGULAR_MAX_VEL 0.3
+#define LINEAR_MAX_VEL 0.15  //速度最大值
+#define ANGULAR_MAX_VEL 0.5
 
 #endif

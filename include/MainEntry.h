@@ -38,7 +38,7 @@ void assignPoseForTagData(TagData *tagData, OdomData odom);
 // PID controller
 class Controller
 {
-private:
+public:
     // ofstream					outfile;
     CMyApplication myReaderApp;
 
@@ -98,6 +98,9 @@ private:
     int phase_flag_right = 0;
     int phase_num_count_right = 0; // 记录当前相位的读取个数，一个相位观测值对应增加1
     int phase_num_count_left = 0;  // 记录当前相位的读取个数，一个相位观测值对应增加1
+    int no_tag_cnt = 0;
+    int no_tag_cnt_left = 0;
+    int no_tag_cnt_right = 0;
     
     VectorXd phase_pre_left_antenna=VectorXd(10000);
     VectorXd phase_pre_right_antenna=VectorXd(10000);
@@ -142,7 +145,10 @@ private:
     MatrixXd PF_w=MatrixXd(3, PF_count);        // 粒子与观测值之间的权重因子，第三行用于综合评价
 
     MatrixXd PF_center_mean=MatrixXd(2, 10000); // 保存粒子的中心位置，第一行：x，第二行：y，第三行：前5次定位结果的x轴标准差，第四行：前5次定位结果的x轴标准差
-
+    vector<MatrixXd> PF_point_all_x;
+    vector<MatrixXd> PF_point_all_y;
+    vector<MatrixXd> PF_point_all_x_after;
+    vector<MatrixXd> PF_point_all_y_after;
     // VectorXd totaltime(2000);
     double totaltime[10000];
     /////!!!!!!!
@@ -159,14 +165,23 @@ private:
     double last_error_y_, last_error_sum_y_, last_error_diff_y_ = 0;
     double last_error_angle_, last_error_sum_angle_, last_error_diff_angle_ = 0;
 
-public:
+    double left_g,right_g;
+    int flag_g=0;
+    vector<double> delta_g;
+    vector<double> left_g_save;
+    vector<double> right_g_save;
+
     Controller();  
     int iteration_count=0;
     geometry_msgs::Twist vel_msg;
+
+
     // PID控制
     double pid_x_compute(double real_position, double target_position);
     double pid_y_compute(double real_position, double target_position);
-    double pid_angle_compute(double real_angle, double target_angle);
+    double pid_angle_compute(double left_g, double right_g);
+
+    void getGradient(int i,vector<TagData> leftTagDataArray, vector<TagData> rightTagDataArray);
 
     // 粒子滤波
     tuple<double, double> getMotion(vector<TagData>* leftTagDataArray, vector<TagData>* rightTagDataArray, OdomData odom, int i);

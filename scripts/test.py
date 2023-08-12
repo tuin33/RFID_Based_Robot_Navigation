@@ -28,8 +28,8 @@ def play_audio(audio_file="/home/haoran/audio/welcome1.wav"):
     pygame.mixer.music.play()  # 播放音频文件
 
 headers = {"Content-Type": "application/json"}
-url = "http://124.221.141.85:42200/transcribe"
-clear_url = "http://124.221.141.85:42200/clear_cache"
+url = "http://127.0.0.1/transcribe"
+clear_url = "http://127.0.0.1/clear_cache"
 
 revive_keyword = ['丁真同学']
 forward_keyword = ['前进', '前方', '前面', '向前', '前行']

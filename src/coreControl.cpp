@@ -279,10 +279,12 @@ void multiThreadListener::chatterCallback3(const RFID_Based_Robot_Navigation::se
         if (angular > ANGULAR_MAX_VEL)
         {
             angular = ANGULAR_MAX_VEL;
+            cout<<"angular > ANGULAR_MAX_VEL!"<<endl;
         }
         else if (angular < -ANGULAR_MAX_VEL)
         {
             angular = -ANGULAR_MAX_VEL;
+            cout<<"angular > ANGULAR_MAX_VEL!"<<endl;
         }
 
         control.vel_msg.linear.x = linear_x;
